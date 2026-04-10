@@ -70,52 +70,52 @@ function App() {
 
       
       <main className="flex-1 flex flex-col overflow-hidden relative">
-        <header className="px-8 py-6 flex items-center justify-between border-b border-[var(--border-light)] bg-white/30 backdrop-blur-xl">
+        <header className="px-8 py-6 flex items-center justify-between border-b border-slate-200 bg-white/50 backdrop-blur-md sticky top-0 z-10">
           <div className="flex flex-col">
-            <h2 className="text-xl font-black text-[var(--text-primary)] uppercase tracking-tight">
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight">
               {bookmarks.activeContext === 'pro' ? 'Espace Professionnel' : 'Espace Personnel'}
             </h2>
-            <p className="text-[10px] font-bold text-[var(--text-dim)] uppercase tracking-[0.2em]">
-              {bookmarks.searchQuery ? `Résultats pour "${bookmarks.searchQuery}"` : 'Toutes vos ressources'}
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+              {bookmarks.searchQuery ? `Résultats pour "${bookmarks.searchQuery}"` : 'Gestionnaire de ressources'}
             </p>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <button 
               onClick={() => setIsAddOpen(true)}
-              className="px-6 py-3 rounded-2xl bg-[var(--accent-current)] text-white hover:opacity-90 shadow-lg shadow-[var(--accent-current)]/20 transition-all flex items-center gap-2 font-black text-xs uppercase tracking-widest"
+              className="px-5 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all flex items-center gap-2 font-bold text-[10px] uppercase tracking-widest"
             >
-              <Plus size={18} /> Nouveau Favori
+              <Plus size={14} /> Nouveau
             </button>
             
-            <div className="h-8 w-[1px] bg-[var(--border-light)] mx-2" />
+            <div className="h-6 w-[1px] bg-slate-200 mx-2" />
 
             <button 
               onClick={handleExport}
               title="Exporter JSON"
-              className="p-3 rounded-2xl bg-white border border-[var(--border-light)] text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] transition-all shadow-sm"
+              className="p-2.5 rounded-xl bg-white border border-slate-200 text-slate-500 hover:border-slate-300 transition-all"
             >
-              <Download size={18} />
+              <Download size={16} />
             </button>
             
             <button 
               onClick={() => setIsImportOpen(true)}
-              title="Importer SiteBar / HTML"
-              className="p-3 rounded-2xl bg-white border border-[var(--border-light)] text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] transition-all shadow-sm"
+              title="Importer"
+              className="p-2.5 rounded-xl bg-white border border-slate-200 text-slate-500 hover:border-slate-300 transition-all"
             >
-              <Upload size={18} />
+              <Upload size={16} />
             </button>
 
             <button 
               onClick={auth.logout}
               title="Déconnexion"
-              className="p-3 rounded-2xl bg-red-50 border border-red-100 text-red-400 hover:bg-red-100 transition-all shadow-sm"
+              className="p-2.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-500 hover:bg-rose-50 hover:text-rose-500 transition-all ml-2"
             >
-              <LogOut size={18} />
+              <LogOut size={16} />
             </button>
           </div>
-
         </header>
+
 
         <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
           <MainContent 

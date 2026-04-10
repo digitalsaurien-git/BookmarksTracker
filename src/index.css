@@ -1,18 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Playfair+Display:wght@700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --bg-primary: #faf7f2;
-  --bg-secondary: #efebe9;
-  --text-primary: #5d4037;
-  --text-secondary: #8d6e63;
-  --text-dim: #a1887f;
-  --accent-pro: #8d6e63;
-  --accent-perso: #c2ada7;
-  --border-light: rgba(93, 64, 55, 0.08);
-  --card-bg: #ffffff;
-  --radius-md: 16px;
-  --radius-lg: 24px;
+  --primary: #0f172a;
+  --accent: #3b82f6;
+  --accent-soft: rgba(59, 130, 246, 0.1);
+  --background: #f8fafc;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --text-main: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --shadow-card: 0 10px 25px -5px rgba(0,0,0,0.05);
 }
+
 
 
 
@@ -23,12 +26,13 @@
 }
 
 body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+  background-color: var(--background);
+  color: var(--text-main);
   min-height: 100vh;
   overflow: hidden;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
+
 
 
 #root {
@@ -66,14 +70,15 @@ input:focus {
 }
 
 .pro-theme {
-  --accent-current: #5d4037;
-  --accent-soft: rgba(93, 64, 55, 0.05);
+  --accent-current: var(--primary);
+  --accent-soft: rgba(15, 23, 42, 0.05);
 }
 
 .perso-theme {
-  --accent-current: #8d6e63;
-  --accent-soft: rgba(141, 110, 99, 0.08);
+  --accent-current: var(--accent);
+  --accent-soft: rgba(59, 130, 246, 0.08);
 }
+
 
 
 /* Animations */

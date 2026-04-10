@@ -20,7 +20,7 @@ const LoginView = ({ auth }) => {
       
       if (success && isRegistering) {
         setIsRegistering(false);
-        auth.setError("Compte créé ! Vous pouvez maintenant vous connecter (vérifiez vos emails pour validation).");
+        auth.setError("Compte créé ! Vous pouvez maintenant vous connecter.");
       }
     } catch (err) {
       console.error(err);
@@ -30,9 +30,9 @@ const LoginView = ({ auth }) => {
   };
 
   return (
-    <div className="h-screen w-full flex bg-[#faf7f2] overflow-hidden">
-      {/* Left Column: Visual & Brand (Editorial Library Look) */}
-      <div className="hidden lg:flex w-7/12 relative h-full overflow-hidden">
+    <div className="h-screen w-full flex bg-slate-50 overflow-hidden font-sans">
+      {/* Left Column: Visual & Brand */}
+      <div className="hidden lg:flex w-7/12 relative h-full overflow-hidden bg-slate-900">
         <motion.div 
            initial={{ scale: 1.1, opacity: 0 }}
            animate={{ scale: 1, opacity: 1 }}
@@ -40,20 +40,23 @@ const LoginView = ({ auth }) => {
            className="absolute inset-0 z-0"
         >
           <img 
-            src="/brain/51a95abd-e067-48c5-aa28-c77822c69cc0/premium_bookmarks_login_side_1775820814318.png" 
-            alt="Library Aesthetic" 
-            className="w-full h-full object-cover"
+            src="/assets/login-side.png" 
+            alt="Library" 
+            className="w-full h-full object-cover opacity-60"
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.parentElement.style.background = 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)';
+            }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-white" />
-          <div className="absolute inset-0 bg-[#faf7f2]/10 backdrop-blur-[2px]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent" />
         </motion.div>
 
         <div className="relative z-10 w-full p-20 flex flex-col justify-between">
           <div className="flex items-center gap-4">
-             <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-2xl">
-                <Bookmark className="text-[#8d6e63]" size={24} />
+             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-xl shadow-blue-500/20">
+                <Bookmark className="text-white" size={20} />
              </div>
-             <span className="text-xl font-black text-white tracking-[0.2em] uppercase drop-shadow-md">Digital Saurien</span>
+             <span className="text-lg font-extrabold text-white tracking-[0.2em] uppercase">Digital Saurien</span>
           </div>
 
           <div className="max-w-xl">
@@ -61,51 +64,50 @@ const LoginView = ({ auth }) => {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="text-6xl font-black text-white leading-tight drop-shadow-xl mb-6"
+                className="text-6xl font-extrabold text-white leading-tight mb-8"
              >
-                Votre bibliothèque numérique, <br/>
-                <span className="text-[#efebe9] italic">parfaitement ordonnée.</span>
+                Organisez vos savoirs numérique.
              </motion.h2>
-             <div className="flex gap-8">
-                <div className="flex flex-col gap-2">
-                   <div className="flex items-center gap-2 text-white/80 font-bold text-xs">
-                      <Layers size={14} className="text-[#d7ccc8]" /> HIÉRARCHIE
+             <div className="grid grid-cols-2 gap-8">
+                <div className="space-y-3">
+                   <div className="flex items-center gap-2 text-blue-400 font-bold text-xs uppercase tracking-widest">
+                      <Layers size={14} /> Structure
                    </div>
-                   <p className="text-white/60 text-[10px] leading-relaxed max-w-[150px]">Organisation récursive intelligente pour vos centaines de ressources.</p>
+                   <p className="text-slate-400 text-xs leading-relaxed">Arborescence récursive pour une gestion type bibliothèque.</p>
                 </div>
-                <div className="flex flex-col gap-2">
-                   <div className="flex items-center gap-2 text-white/80 font-bold text-xs">
-                      <Zap size={14} className="text-[#d7ccc8]" /> CLOUD SYNC
+                <div className="space-y-3">
+                   <div className="flex items-center gap-2 text-blue-400 font-bold text-xs uppercase tracking-widest">
+                      <Zap size={14} /> Synchro
                    </div>
-                   <p className="text-white/60 text-[10px] leading-relaxed max-w-[150px]">Accédez à votre catalogue depuis n'importe quel poste de travail.</p>
+                   <p className="text-slate-400 text-xs leading-relaxed">Synchronisation Cloud via Supabase pour tous vos postes.</p>
                 </div>
              </div>
           </div>
 
-          <p className="text-white/40 text-[10px] uppercase font-black tracking-widest">Est. 2024 — Digital Saurien Ecosystem</p>
+          <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">Bookmarks Tracker &copy; 2024</p>
         </div>
       </div>
 
       {/* Right Column: Authentication Form */}
-      <div className="w-full lg:w-5/12 h-full flex items-center justify-center p-8 bg-white lg:bg-transparent relative">
-        <div className="w-full max-w-md">
-          <div className="mb-12 text-center lg:text-left">
-            <h1 className="text-4xl font-black text-[#5d4037] mb-2 uppercase tracking-tighter">
-               {isRegistering ? "Créer un profil" : "Authentification"}
+      <div className="w-full lg:w-5/12 h-full flex items-center justify-center p-8 bg-white relative">
+        <div className="w-full max-w-sm">
+          <div className="mb-12">
+            <h1 className="text-3xl font-extrabold text-slate-900 mb-2">
+               {isRegistering ? "Rejoindre le Cloud" : "Bienvenue"}
             </h1>
-            <p className="text-[10px] font-black text-[#a1887f] uppercase tracking-[0.3em] opacity-60">
-               Accès à votre catalogue personnel
+            <p className="text-sm font-medium text-slate-500">
+               {isRegistering ? "Créez votre compte pour sauvegarder vos favoris." : "Connectez-vous pour accéder à votre bibliothèque."}
             </p>
           </div>
 
           {auth.error && (
             <motion.div 
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className={`p-4 rounded-2xl mb-8 text-xs font-bold border ${
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className={`p-4 rounded-xl mb-8 text-xs font-bold border ${
                 auth.error.includes('créé') 
-                ? 'bg-green-50 border-green-100 text-green-600' 
-                : 'bg-red-50 border-red-100 text-red-500 shadow-sm shadow-red-100'
+                ? 'bg-emerald-50 border-emerald-100 text-emerald-600' 
+                : 'bg-rose-50 border-rose-100 text-rose-500'
               }`}
             >
               {auth.error}
@@ -114,30 +116,30 @@ const LoginView = ({ auth }) => {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-[#5d4037] uppercase tracking-widest pl-1">Identifiant Email</label>
+              <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest pl-1">Identifiant</label>
               <div className="relative group">
-                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-[#a1887f] group-focus-within:text-[#8d6e63] transition-colors" size={18} />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={18} />
                 <input 
                   type="email" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full pl-14 pr-6 py-5 bg-[#faf7f2]/80 border-b-2 border-[#d7ccc8]/30 rounded-2xl outline-none focus:border-[#8d6e63] focus:bg-white focus:shadow-xl focus:shadow-[#5d4037]/5 transition-all text-[#5d4037] font-bold placeholder-[#a1887f]/40"
-                  placeholder="votre.nom@prestataire.com"
+                  className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-900 font-semibold text-sm"
+                  placeholder="votre@email.com"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-[#5d4037] uppercase tracking-widest pl-1">Code d'accès</label>
+              <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest pl-1">Mot de passe</label>
               <div className="relative group">
-                <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-[#a1887f] group-focus-within:text-[#8d6e63] transition-colors" size={18} />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={18} />
                 <input 
                   type="password" 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full pl-14 pr-6 py-5 bg-[#faf7f2]/80 border-b-2 border-[#d7ccc8]/30 rounded-2xl outline-none focus:border-[#8d6e63] focus:bg-white focus:shadow-xl focus:shadow-[#5d4037]/5 transition-all text-[#5d4037] font-bold placeholder-[#a1887f]/40"
+                  className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-900 font-semibold text-sm"
                   placeholder="••••••••••••"
                 />
               </div>
@@ -146,38 +148,39 @@ const LoginView = ({ auth }) => {
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full py-6 bg-[#5d4037] text-white rounded-3xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-[#5d4037]/20 hover:bg-[#4e342e] transform active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50 mt-10 group"
+              className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transform active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50 shadow-lg shadow-slate-900/10"
             >
               {loading ? (
-                <Loader2 className="animate-spin" size={20} />
+                <Loader2 className="animate-spin" size={18} />
               ) : (
                 <>
-                  {isRegistering ? "Initier l'inscription" : "Ouvrir ma bibliothèque"}
-                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                  {isRegistering ? "Créer mon compte" : "Se connecter"}
+                  <ArrowRight size={18} />
                 </>
               )}
             </button>
           </form>
 
-          <footer className="mt-16 pt-8 border-t border-[#d7ccc8]/30 flex flex-col items-center gap-6">
+          <div className="mt-12 pt-8 border-t border-slate-100 text-center">
+            <p className="text-sm text-slate-500 mb-4">
+              {isRegistering ? "Déjà membre ?" : "Nouveau ici ?"}
+            </p>
             <button 
               onClick={() => {
                 setIsRegistering(!isRegistering);
                 auth.setError(null);
               }}
-              className="text-[11px] font-black text-[#8d6e63] hover:text-[#5d4037] transition-all uppercase tracking-widest flex items-center gap-3 group"
+              className="px-6 py-2 rounded-lg border border-slate-200 text-slate-700 font-bold text-xs uppercase tracking-widest hover:bg-slate-50 transition-all"
             >
-              <div className="w-10 h-10 border-2 border-[#d7ccc8]/50 rounded-full flex items-center justify-center group-hover:border-[#8d6e63] transition-all">
-                {isRegistering ? <LogIn size={16} /> : <UserPlus size={16} />}
-              </div>
-              <span>{isRegistering ? "Retour à la connexion" : "Pas de compte ? S'abonner gratuitement"}</span>
+              {isRegistering ? "Se connecter" : "S'inscrire"}
             </button>
-            <div className="flex items-center gap-2 text-[9px] text-[#a1887f] font-bold uppercase tracking-widest opacity-40">
-               <Globe size={12} /> Digital Saurien &copy; 2024
-            </div>
-          </footer>
+          </div>
         </div>
       </div>
+
+      <style jsx>{`
+         .font-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
+      `}</style>
     </div>
   );
 };

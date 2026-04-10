@@ -7,17 +7,32 @@ import SearchBar from './components/SearchBar';
 import AddBookmarkForm from './components/AddBookmarkForm';
 import LoginView from './components/LoginView';
 import { Download, Upload, Plus, LogOut } from 'lucide-react';
+import { motion } from 'framer-motion';
+
 
 
 function App() {
-  const bookmarks = useBookmarks();
   const auth = useAuth();
+  const bookmarks = useBookmarks(auth.user);
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [selectedFolderId, setSelectedFolderId] = useState('root-' + bookmarks.activeContext);
+  const [selectedFolderId, setSelectedFolderId] = useState('root-' + (bookmarks.activeContext || 'perso'));
+
+  if (auth.isLoading) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-[#0d1117]">
+        <motion.div 
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+          className="w-8 h-8 border-4 border-blue-500/30 border-t-blue-500 rounded-full"
+        />
+      </div>
+    );
+  }
 
   if (!auth.isAuthenticated) {
     return <LoginView auth={auth} />;
   }
+
 
 
   const handleExport = () => {

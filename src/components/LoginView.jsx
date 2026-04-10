@@ -1,127 +1,123 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Lock, User, ArrowRight, CheckCircle, AlertCircle, Briefcase, Heart } from 'lucide-react';
+import { Shield, Lock, User, ArrowRight, AlertCircle, Sparkles, Mail, Eye, EyeOff } from 'lucide-react';
 
 const LoginView = ({ auth }) => {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isRegistering, setIsRegistering] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const isInitial = !auth.hasPassword;
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     auth.setError(null);
 
-    // Artificial delay to make it feel premium/secure
+    // Premium delay
     await new Promise(r => setTimeout(r, 600));
 
-    if (isInitial) {
-      if (password !== confirmPassword) {
-        auth.setError("Les mots de passe ne correspondent pas.");
-        setIsSubmitting(false);
-        return;
+    let success = false;
+    if (isRegistering) {
+      success = await auth.signup(email, password);
+      if (success) {
+        // Automatically switch to login or show success message
+        setIsRegistering(false);
+        auth.setError("Compte créé ! Veuillez vérifier vos emails ou vous connecter.");
       }
-      if (password.length < 4) {
-        auth.setError("Le mot de passe doit faire au moins 4 caractères.");
-        setIsSubmitting(false);
-        return;
-      }
-      await auth.setPassword(password);
     } else {
-      const success = await auth.login(password);
-      if (!success) setIsSubmitting(false);
+      success = await auth.login(email, password);
     }
+    
+    setIsSubmitting(false);
   };
 
   return (
-    <div className="h-screen w-full flex items-center justify-center login-bg p-4 overflow-hidden">
+    <div className="h-screen w-full flex items-center justify-center login-bg p-4 overflow-hidden bg-[#0d1117]">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="login-card"
+        className="login-card w-full max-w-[400px]"
       >
-        <div className="dots-header">
+        <div className="dots-header mb-10">
           <span>::</span> BOOKMARKS TRACKER <span>::</span>
         </div>
 
-        <div className="flex flex-col items-center mb-8">
+        <div className="flex flex-col items-center mb-10">
           <motion.div 
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--accent-pro)] to-[var(--accent-perso)] flex items-center justify-center mb-4 shadow-lg shadow-blue-500/20"
+            className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center mb-6 border border-white/5"
           >
-            {isInitial ? <Shield className="text-white" size={32} /> : <Lock className="text-white" size={32} />}
+            <Shield className="text-blue-400" size={32} />
           </motion.div>
-          <h2 className="text-xl font-bold text-center">
-            {isInitial ? "Bienvenue !" : "Bon retour parmi nous"}
+          <h2 className="text-2xl font-bold text-center tracking-tight">
+            {isRegistering ? "Créer un compte" : "Authentification"}
           </h2>
-          <p className="text-sm text-[var(--text-secondary)] text-center mt-1">
-            {isInitial 
-              ? "Définissons votre mot de passe maître pour sécuriser vos liens." 
-              : "Veuillez vous authentifier pour accéder à votre coffre-fort."}
+          <p className="text-xs text-gray-500 text-center mt-2 font-medium uppercase tracking-widest">
+            SYNCHRONISATION CLOUD SÉCURISÉE
           </p>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-5">
           <AnimatePresence mode="wait">
             {auth.error && (
               <motion.div 
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center gap-2 text-red-400 text-sm overflow-hidden"
+                className="p-3 rounded-xl bg-red-500/10 border border-red-500/10 flex items-center gap-3 text-red-400 text-xs overflow-hidden"
               >
-                <AlertCircle size={16} />
-                {auth.error}
+                <AlertCircle size={16} className="shrink-0" />
+                <span>{auth.error}</span>
               </motion.div>
             )}
           </AnimatePresence>
 
           <div className="login-input-group">
-            <label>MOT DE PASSE</label>
+            <label>IDENTIFIANT (EMAIL)</label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" size={18} />
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
               <input 
-                type="password" 
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-[var(--accent-pro)] transition-colors"
+                type="email" 
+                placeholder="votre@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full pl-12 pr-4 py-3.5 bg-white/[0.03] border border-white/5 rounded-2xl focus:border-blue-500/50 transition-all outline-none text-sm"
                 autoFocus
                 required
               />
             </div>
           </div>
 
-          {isInitial && (
-            <motion.div 
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="login-input-group"
-            >
-              <label>CONFIRMATION</label>
-              <div className="relative">
-                <CheckCircle className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" size={18} />
-                <input 
-                  type="password" 
-                  placeholder="••••••••"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-[var(--accent-pro)] transition-colors"
-                  required
-                />
-              </div>
-            </motion.div>
-          )}
+          <div className="login-input-group">
+            <label>MOT DE PASSE</label>
+            <div className="relative">
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+              <input 
+                type={showPassword ? "text" : "password"} 
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full pl-12 pr-12 py-3.5 bg-white/[0.03] border border-white/5 rounded-2xl focus:border-blue-500/50 transition-all outline-none text-sm"
+                required
+              />
+              <button 
+                type="button" 
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
 
           <button 
             type="submit" 
             disabled={isSubmitting}
-            className="login-btn group"
+            className="login-btn group w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl font-bold shadow-lg shadow-blue-900/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
             {isSubmitting ? (
               <motion.div 
@@ -131,33 +127,29 @@ const LoginView = ({ auth }) => {
               />
             ) : (
               <>
-                {isInitial ? "C'EST PARTI" : "ENTRER"}
+                {isRegistering ? "CRÉER MON COMPTE" : "SE CONNECTER"}
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </>
             )}
           </button>
         </form>
 
-        <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-around">
-          <div className="flex flex-col items-center gap-1">
-            <Briefcase size={20} className="text-[var(--accent-pro)]" />
-            <span className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-wider">BOULOT</span>
-          </div>
-          <div className="flex flex-col items-center gap-1">
-            <Heart size={20} className="text-[var(--accent-perso)]" />
-            <span className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-wider">PERSO</span>
-          </div>
+        <div className="mt-8 text-center">
+          <button 
+            onClick={() => {
+              setIsRegistering(!isRegistering);
+              auth.setError(null);
+            }}
+            className="text-xs text-gray-500 hover:text-blue-400 transition-colors font-semibold"
+          >
+            {isRegistering ? "Déjà un compte ? Connectez-vous" : "Pas encore de compte ? Inscrivez-vous"}
+          </button>
         </div>
       </motion.div>
       
-      {/* Decorative Orbs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[100px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 blur-[100px] rounded-full pointer-events-none" />
-
-      <style jsx>{`
-        .shadow-blue-500/20 { box-shadow: 0 10px 15px -3px rgba(56, 139, 253, 0.2); }
-        .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-      `}</style>
+      {/* Orbes Décoratives - Plus Subtiles */}
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none" />
     </div>
   );
 };

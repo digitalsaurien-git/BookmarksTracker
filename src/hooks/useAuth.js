@@ -1,68 +1,82 @@
 import { useState, useEffect } from 'react';
-
-const AUTH_KEY = 'bookmarks_tracker_auth';
-const PASSWORD_HASH_KEY = 'bookmarks_tracker_pwd';
+import { supabase } from '../supabase';
 
 export function useAuth() {
+  const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [hasPassword, setHasPassword] = useState(() => {
-    return !!localStorage.getItem(PASSWORD_HASH_KEY);
-  });
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Simple SHA-256 hash using browser native API
-  const hashPassword = async (password) => {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  };
+  useEffect(() => {
+    // Check active sessions and sets the user
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+      setIsAuthenticated(!!session);
+      setIsLoading(false);
+    };
 
-  const setPassword = async (newPassword) => {
+    checkSession();
+
+    // Listen for changes on auth state (logged in, signed out, etc.)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null);
+        setIsAuthenticated(!!session);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const login = async (email, password) => {
     try {
-      const hash = await hashPassword(newPassword);
-      localStorage.setItem(PASSWORD_HASH_KEY, hash);
-      setHasPassword(true);
-      setIsAuthenticated(true);
       setError(null);
+      // We use email as 'identifiant' for Supabase Auth, 
+      // but we can map a username to it or just use email.
+      // If the user wants a 'Login', we can assume it's their email.
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
       return true;
     } catch (e) {
-      setError("Erreur lors de la configuration du mot de passe.");
+      setError(e.message || "Erreur lors de la connexion.");
       return false;
     }
   };
 
-  const login = async (password) => {
+  const signup = async (email, password) => {
     try {
-      const storedHash = localStorage.getItem(PASSWORD_HASH_KEY);
-      const inputHash = await hashPassword(password);
-      
-      if (inputHash === storedHash) {
-        setIsAuthenticated(true);
-        setError(null);
-        return true;
-      } else {
-        setError("Mot de passe incorrect.");
-        return false;
-      }
+      setError(null);
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+      return true;
     } catch (e) {
-      setError("Erreur lors de la connexion.");
+      setError(e.message || "Erreur lors de l'inscription.");
       return false;
     }
   };
 
-  const logout = () => {
-    setIsAuthenticated(false);
+  const logout = async () => {
+    await supabase.auth.signOut();
   };
 
   return {
     isAuthenticated,
-    hasPassword,
+    user,
     error,
+    isLoading,
     login,
-    setPassword,
+    signup,
     logout,
-    setError
+    setError,
+    hasPassword: true // Always true for Cloud auth
   };
 }

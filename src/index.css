@@ -1,13 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
 
 :root {
   --primary: #0f172a;
   --accent: #3b82f6;
-  --background: #f1f5f9; /* Lighter background for better contrast */
+  --background: #f1f5f9;
   --surface: #ffffff;
   --border: #e2e8f0;
   --text-main: #0f172a;
@@ -18,11 +18,9 @@
   --radius-lg: 1.25rem;
   --radius-xl: 2rem;
 
-  /* Aliases for App.jsx and Modals */
   --bg-primary: var(--background);
   --text-primary: var(--text-main);
   
-  /* Glass effects for ImportModal and others */
   --glass-bg: rgba(255, 255, 255, 0.8);
   --glass-border: rgba(255, 255, 255, 0.2);
   --glass-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.1);
@@ -41,7 +39,7 @@ body {
   min-height: 100vh;
   width: 100%;
   overflow-x: hidden;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans);
 }
 
 #root {
@@ -49,7 +47,6 @@ body {
   width: 100%;
 }
 
-/* Scrollbar System */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
@@ -67,7 +64,6 @@ body {
   background: #94a3b8;
 }
 
-/* Glass panel utility */
 .glass {
   background: var(--glass-bg);
   backdrop-filter: blur(12px);
@@ -76,7 +72,6 @@ body {
   box-shadow: var(--glass-shadow);
 }
 
-/* Dark glass for specific components */
 .glass-dark {
   background: rgba(15, 23, 42, 0.8);
   backdrop-filter: blur(12px);
@@ -84,19 +79,6 @@ body {
   color: white;
 }
 
-input::placeholder {
-  color: #94a3b8;
-}
-
-.pro-theme {
-  --accent-current: var(--primary);
-}
-
-.perso-theme {
-  --accent-current: var(--accent);
-}
-
-/* Animations */
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }

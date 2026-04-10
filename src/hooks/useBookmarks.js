@@ -30,7 +30,7 @@ export function useBookmarks(user) {
       setIsSyncing(true);
       try {
         const { data: cloudData, error } = await supabase
-          .from('user_data')
+          .from('bookmarks_user_data')
           .select('payload')
           .eq('user_id', user.id)
           .single();
@@ -48,7 +48,7 @@ export function useBookmarks(user) {
             const parsed = JSON.parse(localSaved);
             setData(parsed);
             // Push to cloud immediately
-            await supabase.from('user_data').insert({
+            await supabase.from('bookmarks_user_data').insert({
               user_id: user.id,
               payload: parsed,
               updated_at: new Date().toISOString()
@@ -72,7 +72,7 @@ export function useBookmarks(user) {
 
     if (user) {
       try {
-        await supabase.from('user_data').upsert({
+        await supabase.from('bookmarks_user_data').upsert({
           user_id: user.id,
           payload: newData,
           updated_at: new Date().toISOString()
@@ -82,6 +82,7 @@ export function useBookmarks(user) {
       }
     }
   }, [user]);
+
 
   const setContext = (context) => {
     saveChanges({ ...data, activeContext: context });

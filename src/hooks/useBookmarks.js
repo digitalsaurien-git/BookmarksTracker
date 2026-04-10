@@ -4,11 +4,7 @@ import { supabase } from '../supabase';
 const STORAGE_KEY = 'bookmarks_tracker_data';
 
 const DEFAULT_DATA = {
-  activeContext: 'perso', // 'perso' or 'pro'
-  folders: [
-    { id: 'root-perso', name: 'Favoris Perso', parentId: null, type: 'perso', isExpanded: true },
-    { id: 'root-pro', name: 'Favoris Pro', parentId: null, type: 'pro', isExpanded: true }
-  ],
+  folders: [],
   bookmarks: []
 };
 
@@ -17,12 +13,59 @@ export function useBookmarks(user) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSyncing, setIsSyncing] = useState(false);
 
-  // Load data
+  // Load data & Migration
   useEffect(() => {
+    const processData = (loadedData) => {
+      let migrated = false;
+      let newFolders = [...loadedData.folders];
+      let newBookmarks = [...loadedData.bookmarks];
+
+      // 1. Identify root folders to remove
+      const rootIds = ['root-perso', 'root-pro'];
+      const rootsExist = newFolders.some(f => rootIds.includes(f.id));
+
+      if (rootsExist) {
+        // Move children of roots to top-level (parentId = null)
+        newFolders = newFolders.map(f => {
+          if (rootIds.includes(f.parentId)) {
+            migrated = true;
+            return { ...f, parentId: null };
+          }
+          return f;
+        });
+
+        // Move bookmarks of roots to root (folderId = null)
+        newBookmarks = newBookmarks.map(b => {
+          if (rootIds.includes(b.folderId)) {
+            migrated = true;
+            return { ...b, folderId: null };
+          }
+          return b;
+        });
+
+        // Remove the root folders themselves
+        const filteredFolders = newFolders.filter(f => !rootIds.includes(f.id));
+        if (filteredFolders.length !== newFolders.length) {
+          migrated = true;
+          newFolders = filteredFolders;
+        }
+      }
+
+      if (migrated) {
+        const finalData = { ...loadedData, folders: newFolders, bookmarks: newBookmarks };
+        delete finalData.activeContext;
+        saveChanges(finalData);
+        return finalData;
+      }
+      return loadedData;
+    };
+
     if (!user) {
-      // Offline mode? Use local storage
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) setData(JSON.parse(saved));
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setData(processData(parsed));
+      }
       return;
     }
 
@@ -35,22 +78,21 @@ export function useBookmarks(user) {
           .eq('user_id', user.id)
           .single();
 
-        if (error && error.code !== 'PGRST116') { // PGRST116 is 'no rows found'
+        if (error && error.code !== 'PGRST116') {
           throw error;
         }
 
         if (cloudData?.payload) {
-          setData(cloudData.payload);
+          setData(processData(cloudData.payload));
         } else {
-          // New user or no cloud data: Migration from localStorage
           const localSaved = localStorage.getItem(STORAGE_KEY);
           if (localSaved) {
             const parsed = JSON.parse(localSaved);
-            setData(parsed);
-            // Push to cloud immediately
+            const processed = processData(parsed);
+            setData(processed);
             await supabase.from('bookmarks_user_data').insert({
               user_id: user.id,
-              payload: parsed,
+              payload: processed,
               updated_at: new Date().toISOString()
             });
           }
@@ -84,17 +126,11 @@ export function useBookmarks(user) {
   }, [user]);
 
 
-  const setContext = (context) => {
-    saveChanges({ ...data, activeContext: context });
-  };
-
   const addFolder = (name, parentId = null) => {
-    const parentFolder = data.folders.find(f => f.id === parentId);
     const newFolder = {
       id: 'folder-' + Date.now().toString(),
       name,
       parentId,
-      type: parentFolder ? parentFolder.type : data.activeContext,
       isExpanded: true
     };
     saveChanges({
@@ -122,7 +158,6 @@ export function useBookmarks(user) {
     const newBookmark = {
       id: 'bookmark-' + Date.now().toString(),
       ...bookmark,
-      type: data.activeContext,
       tags: typeof bookmark.tags === 'string' ? bookmark.tags.split(',').map(t => t.trim()).filter(Boolean) : bookmark.tags,
       description: bookmark.description || '',
       faviconUrl: bookmark.faviconUrl || '',
@@ -157,20 +192,18 @@ export function useBookmarks(user) {
   };
 
   const filteredBookmarks = data.bookmarks.filter(b => {
-    const contextMatch = b.type === data.activeContext;
     const query = searchQuery.toLowerCase();
     const searchMatch = !query || b.title.toLowerCase().includes(query) || 
                        b.url.toLowerCase().includes(query) ||
                        b.tags.some(t => t.toLowerCase().includes(query));
-    return contextMatch && searchMatch;
+    return searchMatch;
   });
 
   return {
     data,
-    activeContext: data.activeContext,
-    setContext,
     folders: data.folders,
     bookmarks: filteredBookmarks,
+    allBookmarks: data.bookmarks,
     addFolder,
     deleteFolder,
     toggleFolderExpand,
@@ -184,8 +217,6 @@ export function useBookmarks(user) {
     importData: (newData) => saveChanges(newData),
     exportData: () => JSON.stringify(data, null, 2),
     bulkImport: async (importedFolders, importedBookmarks) => {
-      // Merge imported data with existing root folders if necessary
-      // But user said they have nothing, so we can potentially replace if empty
       const newData = {
         ...data,
         folders: [...data.folders, ...importedFolders],

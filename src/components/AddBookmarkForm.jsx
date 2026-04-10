@@ -125,9 +125,10 @@ const AddBookmarkForm = ({ onClose, onSubmit, folders, defaultFolderId }) => {
               </label>
               <select
                 className="w-full bg-white/5 border border-white/10 rounded-xl p-3 focus:border-blue-500 outline-none appearance-none cursor-pointer"
-                value={formData.folderId}
-                onChange={e => setFormData({...formData, folderId: e.target.value})}
+                value={formData.folderId || ''}
+                onChange={e => setFormData({...formData, folderId: e.target.value || null})}
               >
+                <option value="" className="bg-[#0d1117]">Bibliothèque (Racine)</option>
                 {folders.map(f => (
                   <option key={f.id} value={f.id} className="bg-[#0d1117]">
                     {f.name}

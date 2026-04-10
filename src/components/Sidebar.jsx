@@ -7,14 +7,14 @@ import {
 } from 'lucide-react';
 
 const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
-  const { folders, activeContext, setContext, addFolder } = bookmarks;
+  const { folders, addFolder } = bookmarks;
 
   const handleToggle = (id) => {
     bookmarks.toggleFolderExpand(id);
   };
 
   const getSubfolders = (parentId) => {
-    return folders.filter(f => f.parentId === parentId && f.type === activeContext);
+    return folders.filter(f => f.parentId === parentId);
   };
 
   const FolderItem = ({ folder, level = 0 }) => {
@@ -51,21 +51,19 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
              </span>
           </div>
 
-          {!folder.id.startsWith('root-') && (
-            <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                if (window.confirm(`Supprimer le dossier "${folder.name}" et tout son contenu ?`)) {
-                  bookmarks.deleteFolder(folder.id);
-                }
-              }}
-              className={`p-1.5 opacity-0 group-hover:opacity-100 rounded-lg transition-all ${
-                isSelected ? 'hover:bg-white/20 text-white' : 'hover:bg-rose-50 text-slate-300 hover:text-rose-500'
-              }`}
-            >
-              <Trash2 size={14} />
-            </button>
-          )}
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              if (window.confirm(`Supprimer le dossier "${folder.name}" et tout son contenu ?`)) {
+                bookmarks.deleteFolder(folder.id);
+              }
+            }}
+            className={`p-1.5 opacity-0 group-hover:opacity-100 rounded-lg transition-all ${
+              isSelected ? 'hover:bg-white/20 text-white' : 'hover:bg-rose-50 text-slate-300 hover:text-rose-500'
+            }`}
+          >
+            <Trash2 size={14} />
+          </button>
         </div>
 
         <AnimatePresence>
@@ -99,35 +97,6 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
             <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest mt-1.5 block">Digital Saurien</span>
           </div>
         </div>
-
-        <div className="bg-slate-50 p-1.5 rounded-[1.5rem] flex items-center gap-1.5 border border-slate-100/50">
-          <button 
-            onClick={() => {
-              setContext('perso');
-              onSelectFolder('root-perso');
-            }}
-            className={`flex-1 flex items-center justify-center gap-2.5 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
-              activeContext === 'perso' 
-                ? 'bg-white text-blue-600 shadow-sm border border-slate-100' 
-                : 'text-slate-400 hover:text-slate-600'
-            }`}
-          >
-            <User size={14} /> Perso
-          </button>
-          <button 
-            onClick={() => {
-              setContext('pro');
-              onSelectFolder('root-pro');
-            }}
-            className={`flex-1 flex items-center justify-center gap-2.5 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
-              activeContext === 'pro' 
-                ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/10' 
-                : 'text-slate-400 hover:text-slate-600'
-            }`}
-          >
-            <Briefcase size={14} /> Pro
-          </button>
-        </div>
       </div>
 
       {/* Folders List */}
@@ -138,7 +107,7 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
             <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Explorateur</h3>
           </div>
           <button 
-            onClick={() => addFolder("Nouveau dossier", activeContext, `root-${activeContext}`)}
+            onClick={() => addFolder("Nouveau dossier", selectedFolderId)}
             className="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-blue-500 hover:bg-slate-50 rounded-lg transition-all"
           >
             <FolderPlus size={18} />
@@ -147,19 +116,19 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
         
         <div className="space-y-2">
           <div 
-            onClick={() => onSelectFolder(`root-${activeContext}`)}
+            onClick={() => onSelectFolder(null)}
             className={`flex items-center gap-4 px-5 py-4 rounded-2xl cursor-pointer transition-all ${
-              selectedFolderId === `root-${activeContext}` 
+              selectedFolderId === null 
                 ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/10' 
                 : 'hover:bg-slate-50 text-slate-600'
             }`}
           >
-            <Hash size={18} className={selectedFolderId === `root-${activeContext}` ? 'text-blue-400' : 'opacity-30'} />
-            <span className={`text-[13px] font-black leading-none ${selectedFolderId === `root-${activeContext}` ? 'text-white' : 'text-slate-700'}`}>Tous les favoris</span>
+            <Hash size={18} className={selectedFolderId === null ? 'text-blue-400' : 'opacity-30'} />
+            <span className={`text-[13px] font-black leading-none ${selectedFolderId === null ? 'text-white' : 'text-slate-700'}`}>Tous les favoris</span>
           </div>
 
           <div className="mt-10 pt-6 border-t border-slate-50 space-y-2">
-            {folders.filter(f => f.parentId === `root-${activeContext}`).map(folder => (
+            {folders.filter(f => f.parentId === null).map(folder => (
               <FolderItem key={folder.id} folder={folder} />
             ))}
           </div>

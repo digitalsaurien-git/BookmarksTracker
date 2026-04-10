@@ -13,7 +13,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 function App() {
   const auth = useAuth();
   const bookmarks = useBookmarks(auth.user?.id);
-  const [selectedFolderId, setSelectedFolderId] = useState(`root-${bookmarks.activeContext}`);
+  const [selectedFolderId, setSelectedFolderId] = useState(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
 
@@ -116,7 +116,6 @@ function App() {
           )}
           {isImportOpen && (
             <ImportModal 
-              context={bookmarks.activeContext}
               onClose={() => setIsImportOpen(false)}
               onImport={bookmarks.bulkImport}
             />

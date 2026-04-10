@@ -24,19 +24,25 @@ const BookmarkCard = ({ bookmark, onDelete, onMove }) => {
       layout
       draggable
       onDragStart={onDragStart}
-      className="premium-card p-6 flex flex-col h-full group cursor-grab active:cursor-grabbing"
+      className="premium-card p-4 flex items-center gap-6 group cursor-grab active:cursor-grabbing"
     >
-      <div className="flex items-start justify-between mb-6">
-        <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 shadow-sm">
-          <Globe size={20} />
-        </div>
-        
+      <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm flex-shrink-0">
+        <Globe size={18} />
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <h3 className="text-[14px] font-bold text-slate-900 truncate">
+          {bookmark.title || 'Sans titre'}
+        </h3>
+      </div>
+
+      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
         <div className="relative">
           <button 
             onClick={() => setShowMenu(!showMenu)}
-            className="p-2 text-slate-300 hover:text-slate-900 rounded-xl hover:bg-slate-50 transition-colors"
+            className="p-2 text-slate-300 hover:text-slate-900 rounded-lg hover:bg-slate-50 transition-colors"
           >
-            <MoreVertical size={20} />
+            <MoreVertical size={16} />
           </button>
           
           {showMenu && (
@@ -62,28 +68,12 @@ const BookmarkCard = ({ bookmark, onDelete, onMove }) => {
             </>
           )}
         </div>
-      </div>
 
-      <div className="flex-1 min-w-0 mb-8">
-        <h3 className="text-[17px] font-extrabold text-slate-900 leading-tight mb-2 line-clamp-2">
-          {bookmark.title || 'Sans titre'}
-        </h3>
-        <p className="text-[14px] font-medium text-slate-400 line-clamp-2 leading-relaxed">
-          {bookmark.description || 'Aucune description disponible pour ce favori.'}
-        </p>
-      </div>
-
-      <div className="pt-6 border-t border-slate-50 flex items-center justify-between mt-auto">
-        <div className="flex items-center gap-2 text-[11px] font-black text-slate-300 uppercase tracking-widest">
-          <Clock size={12} />
-          {getDomain(bookmark.url)}
-        </div>
-        
         <a 
           href={bookmark.url} 
           target="_blank" 
           rel="noopener noreferrer"
-          className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white hover:scale-110 active:scale-95 transition-all duration-300 shadow-sm"
+          className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm"
         >
           <ExternalLink size={16} />
         </a>

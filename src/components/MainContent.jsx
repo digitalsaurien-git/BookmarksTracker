@@ -74,7 +74,7 @@ const MainContent = ({ bookmarks, folderId, onAdd }) => {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
         {folderBookmarks.map(bookmark => (
           <BookmarkCard 
             key={bookmark.id} 

@@ -27,7 +27,7 @@ function App() {
       <div className="absolute bottom-[-10%] left-[-10%] w-[30%] h-[30%] bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none" />
 
       {/* Sidebar - Wide and Premium */}
-      <aside className="w-[340px] h-full flex-shrink-0 bg-white border-r border-slate-100 flex flex-col z-10">
+      <aside className="w-[420px] h-full flex-shrink-0 bg-white border-r border-slate-100 flex flex-col z-10">
         <Sidebar 
           bookmarks={bookmarks} 
           onSelectFolder={setSelectedFolderId}

@@ -103,6 +103,7 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 - **UI "Sober Premium"** : Interface épurée avec mesh gradients, flous de profondeur (glassmorphism) et typographie Outfit haute lisibilité.
 - **Importation Universelle** : Parseur Netscape supportant Chrome, Firefox, Safari.
 - **Synchronisation Cloud (Supabase)** : Persistance sécurisée multi-appareils.
-- **Expérience Bureau Class A** : Sidebar large, barre de recherche centrale.
+- **Expérience Bureau Class A** : Sidebar large (420px), barre de recherche centrale.
+- **Vignettes Minimalistes** : Format liste épuré (Icône planète + Titre + Flèche) pour une lecture rapide.
 
 

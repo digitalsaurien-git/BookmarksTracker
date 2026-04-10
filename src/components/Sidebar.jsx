@@ -76,7 +76,7 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
             {hasChildren && (isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />)}
           </div>
           <div className="flex-1 flex items-center gap-4 min-w-0">
-             <div className={`${isSelected ? 'text-blue-400' : 'text-slate-400 opacity-60'}`}>
+             <div className={`${folder.color || (isSelected ? 'text-blue-400' : 'text-slate-400 opacity-60')}`}>
                 {isExpanded ? <FolderOpen size={18} /> : <Folder size={18} />}
              </div>
              <span className={`text-[13px] font-black truncate leading-none ${isSelected ? 'text-white' : 'text-slate-700'}`}>

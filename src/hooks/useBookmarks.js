@@ -58,6 +58,15 @@ export function useBookmarks(user) {
         }
       }
 
+      // 2. Assign colors to folders if missing
+      newFolders = newFolders.map(f => {
+        if (!f.color) {
+          migrated = true;
+          return { ...f, color: FOLDER_COLORS[Math.floor(Math.random() * FOLDER_COLORS.length)] };
+        }
+        return f;
+      });
+
       if (migrated) {
         const finalData = { ...loadedData, folders: newFolders, bookmarks: newBookmarks };
         saveChanges(finalData);
@@ -136,6 +145,12 @@ export function useBookmarks(user) {
     saveChanges({ ...data, activeContext: context });
   };
 
+  const FOLDER_COLORS = [
+    'text-blue-500', 'text-emerald-500', 'text-rose-500', 
+    'text-amber-500', 'text-indigo-500', 'text-violet-500',
+    'text-cyan-500', 'text-orange-500'
+  ];
+
   const addFolder = (name, parentId = null) => {
     const parentFolder = data.folders.find(f => f.id === parentId);
     const newFolder = {
@@ -143,6 +158,7 @@ export function useBookmarks(user) {
       name,
       parentId,
       type: parentFolder ? parentFolder.type : data.activeContext,
+      color: FOLDER_COLORS[Math.floor(Math.random() * FOLDER_COLORS.length)],
       isExpanded: true
     };
     saveChanges({

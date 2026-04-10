@@ -32,7 +32,7 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 
 **OUT** (à exclure ou pour plus tard) :
 - Partage de bookmarks avec d’autres personnes
-- Synchronisation multi-utilisateur/cloud avec authentification
+- Synchronisation multi-utilisateur/cloud avec authentification (Désormais IN avec Supabase)
 - Gestion avancée de droits d’accès
 - Aperçu du site web (miniature)
 - Rappels, notifications ou intégrations externes automatiques
@@ -60,7 +60,7 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 
 **DON'T :**
 - Ne jamais mélanger perso et pro.
-- Interdiction de demander une connexion internet ou un compte tiers pour fonctionner.
+- Interdiction de dépendre trop fortement d'une connexion lente (Mode Offline / Cache requis).
 - Pas de surcharge visuelle ni publicité.
 - Ne jamais perdre un lien sans confirmation.
 
@@ -69,7 +69,7 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 - Stockage : `localStorage` pour compatibilité totale avec proxy/restrictions entreprise.
 - Layout : Sidebar à gauche pour l’arborescence, panneau principal pour listes et détails.
 - Navigation : SPA (single page, tout accessible sans recharger).
-- Aucune dépendance obligatoire à un backend externe ou cloud.
+- Backend Cloud : Intégration Supabase pour la synchronisation en temps réel.
 
 ## 8) Plan de mission (etapes en langage humain)
 1. **Accueil Perso/Pro** : L’utilisateur accède à deux sections séparées dès la page d’accueil (preuve : capture d’écran affichant "Perso" et "Pro").
@@ -102,28 +102,12 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 
 ---
 
-## 11) Fonctionnalités développées (v1.0)
-- **Multi-Context (Perso/Pro)** : Séparation stricte des environnements avec thèmes visuels distincts (Indigo pour Pro, Lavender pour Perso).
-- **Gestion d'Arborescence** : Création, renommage (via UI) et suppression de dossiers et sous-dossiers.
-- **Bookmarks Visuels** : 
-    - Cartes riches avec récupération automatique de favicons.
-    - Affichage des titres et URLs tronqués pour la lisibilité.
-    - Système de tags colorés.
-- **Moteur de Recherche** : Filtrage instantané par titre, URL ou tags dans le contexte actif.
-- **Gestion des Liens** :
-    - Ajout rapide via formulaire modal.
-    - Déplacement facile entre dossiers via menu contextuel.
-    - Suppression sécurisée.
-- **Portabilité des Données** :
-    - Exportation complète au format JSON.
-    - Importation fluide avec restauration instantanée de la structure.
-- **Expérience Utilisateur (UX)** :
-    - Interface 100% Responsive et fluide.
-    - Animations fluides via Framer Motion.
-    - Persistance locale robuste via `localStorage`.
-- **Sécurité & Authentification** :
-    - Double mode : Initialisation du mot de passe maître ou Connexion.
-    - Hachage sécurisé (SHA-256) stocké localement.
-    - Interface premium centrée inspirée de SiteBar.
+
+## 12) Évolutions Premium (v2.0)
+- **UI "Sober Premium"** : Interface épurée avec mesh gradients, flous de profondeur (glassmorphism) et typographie Outfit haute lisibilité.
+- **Importation Universelle** : Parseur HTML Netscape supportant les exports de tous les navigateurs majeurs (Chrome, Firefox, Safari, SiteBar).
+- **Synchronisation Cloud (Supabase)** : Persistance sécurisée des dossiers et favoris avec accès multi-appareils.
+- **Performance Optimisée** : Migration vers Tailwind 4 et Vite 8 pour des temps de chargement ultra-rapides.
+- **Expérience Bureau Class A** : Sidebar large et confortable, barre de recherche centrale inspirée des meilleurs outils de productivité (Command+K).
 
 

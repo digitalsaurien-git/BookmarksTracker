@@ -99,7 +99,9 @@ const MainContent = ({ bookmarks, folderId, onAdd }) => {
           <BookmarkCard 
             key={bookmark.id} 
             bookmark={bookmark}
+            folders={bookmarks.folders}
             onDelete={bookmarks.deleteBookmark}
+            onUpdate={bookmarks.updateBookmark}
             onIncrement={bookmarks.incrementClickCount}
           />
         ))}

@@ -1,9 +1,11 @@
 import React from 'react';
-import { ExternalLink, MoreVertical, Trash2, Globe } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ExternalLink, MoreVertical, Trash2, Globe, Edit3 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import EditBookmarkForm from './EditBookmarkForm';
 
-const BookmarkCard = ({ bookmark, onDelete, onIncrement }) => {
+const BookmarkCard = ({ bookmark, onDelete, onIncrement, onUpdate, folders }) => {
   const [showMenu, setShowMenu] = React.useState(false);
+  const [isEditOpen, setIsEditOpen] = React.useState(false);
   
   // Extract domain for a cleaner look
   const getDomain = (url) => {
@@ -67,6 +69,12 @@ const BookmarkCard = ({ bookmark, onDelete, onIncrement }) => {
               />
               <div className="absolute right-0 mt-1 w-40 bg-white border border-slate-100 rounded-xl shadow-xl z-20 py-1 overflow-hidden animate-fade-in">
                 <button 
+                  onClick={() => { setIsEditOpen(true); setShowMenu(false); }}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-[12px] font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+                >
+                  <Edit3 size={14} /> Éditer
+                </button>
+                <button 
                   onClick={() => { onDelete(bookmark.id); setShowMenu(false); }}
                   className="w-full flex items-center gap-3 px-3 py-2 text-[12px] font-bold text-rose-500 hover:bg-rose-50 transition-colors"
                 >
@@ -88,6 +96,20 @@ const BookmarkCard = ({ bookmark, onDelete, onIncrement }) => {
           <ExternalLink size={14} />
         </a>
       </div>
+
+      <AnimatePresence>
+        {isEditOpen && (
+          <EditBookmarkForm 
+            bookmark={bookmark}
+            folders={folders}
+            onClose={() => setIsEditOpen(false)}
+            onSubmit={(updates) => {
+              onUpdate(bookmark.id, updates);
+              setIsEditOpen(false);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

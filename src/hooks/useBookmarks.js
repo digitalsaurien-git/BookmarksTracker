@@ -220,6 +220,13 @@ export function useBookmarks(user) {
     });
   };
 
+  const updateBookmark = (id, updates) => {
+    saveChanges({
+      ...data,
+      bookmarks: data.bookmarks.map(b => b.id === id ? { ...b, ...updates } : b)
+    });
+  };
+
   const incrementClickCount = (id) => {
     saveChanges({
       ...data,
@@ -266,6 +273,7 @@ export function useBookmarks(user) {
     addBookmark,
     deleteBookmark,
     moveBookmark,
+    updateBookmark,
     incrementClickCount,
     getBookmarkCount,
     searchQuery,

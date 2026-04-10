@@ -5,11 +5,12 @@ const STORAGE_KEY = 'bookmarks_tracker_data';
 const DEFAULT_DATA = {
   activeContext: 'perso', // 'perso' or 'pro'
   folders: [
-    { id: 'root-perso', name: 'Général', parentId: null, type: 'perso' },
-    { id: 'root-pro', name: 'Général', parentId: null, type: 'pro' }
+    { id: 'root-perso', name: 'Favoris Perso', parentId: null, type: 'perso', isExpanded: true },
+    { id: 'root-pro', name: 'Favoris Pro', parentId: null, type: 'pro', isExpanded: true }
   ],
   bookmarks: []
 };
+
 
 export function useBookmarks() {
   const [data, setData] = useState(() => {
@@ -30,17 +31,27 @@ export function useBookmarks() {
   };
 
   const addFolder = (name, parentId = null) => {
+    const parentFolder = data.folders.find(f => f.id === parentId);
     const newFolder = {
-      id: Date.now().toString(),
+      id: 'folder-' + Date.now().toString(),
       name,
       parentId,
-      type: activeContext
+      type: parentFolder ? parentFolder.type : activeContext,
+      isExpanded: true
     };
     setData(prev => ({
       ...prev,
       folders: [...prev.folders, newFolder]
     }));
   };
+
+  const toggleFolderExpand = (folderId) => {
+    setData(prev => ({
+      ...prev,
+      folders: prev.folders.map(f => f.id === folderId ? { ...f, isExpanded: !f.isExpanded } : f)
+    }));
+  };
+
 
   const deleteFolder = (folderId) => {
     setData(prev => ({
@@ -52,16 +63,21 @@ export function useBookmarks() {
 
   const addBookmark = (bookmark) => {
     const newBookmark = {
-      id: Date.now().toString(),
+      id: 'bookmark-' + Date.now().toString(),
       ...bookmark,
       type: activeContext,
-      tags: typeof bookmark.tags === 'string' ? bookmark.tags.split(',').map(t => t.trim()).filter(Boolean) : bookmark.tags
+      tags: typeof bookmark.tags === 'string' ? bookmark.tags.split(',').map(t => t.trim()).filter(Boolean) : bookmark.tags,
+      description: bookmark.description || '',
+      faviconUrl: bookmark.faviconUrl || '',
+      isPrivate: !!bookmark.isPrivate,
+      createdAt: new Date().toISOString()
     };
     setData(prev => ({
       ...prev,
       bookmarks: [...prev.bookmarks, newBookmark]
     }));
   };
+
 
   const deleteBookmark = (id) => {
     setData(prev => ({
@@ -102,20 +118,31 @@ export function useBookmarks() {
            b.tags.some(t => t.toLowerCase().includes(query));
   });
 
+  const getBookmarkCount = (folderId) => {
+    // Count bookmarks in this folder and ALL subfolders
+    const childFolders = data.folders.filter(f => f.parentId === folderId);
+    const subCount = childFolders.reduce((sum, f) => sum + getBookmarkCount(f.id), 0);
+    const directCount = data.bookmarks.filter(b => b.folderId === folderId).length;
+    return directCount + subCount;
+  };
+
   return {
     data,
     activeContext,
     setContext,
-    folders: filteredFolders,
+    folders: data.folders, // Sidebar handles filtering
     bookmarks: filteredBookmarks,
     addFolder,
     deleteFolder,
+    toggleFolderExpand,
     addBookmark,
     deleteBookmark,
     moveBookmark,
+    getBookmarkCount,
     searchQuery,
     setSearchQuery,
     importData,
     exportData: () => JSON.stringify(data, null, 2)
   };
 }
+

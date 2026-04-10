@@ -47,7 +47,9 @@ function App() {
         bookmarks={bookmarks} 
         onSelectFolder={setSelectedFolderId}
         selectedFolderId={selectedFolderId}
+        onAddBookmark={() => setIsAddOpen(true)}
       />
+
       
       <main className="flex-1 flex flex-col overflow-hidden relative">
         <header className="p-6 flex items-center justify-between glass border-b border-white/5">
@@ -92,6 +94,7 @@ function App() {
           folderId={selectedFolderId}
           onAdd={() => setIsAddOpen(true)}
         />
+
 
         {isAddOpen && (
           <AddBookmarkForm 

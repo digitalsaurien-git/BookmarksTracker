@@ -3,7 +3,6 @@ import { useBookmarks } from './hooks/useBookmarks';
 import { useAuth } from './hooks/useAuth';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
-import SearchBar from './components/SearchBar';
 import AddBookmarkForm from './components/AddBookmarkForm';
 import ImportModal from './components/ImportModal';
 import LoginView from './components/LoginView';

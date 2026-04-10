@@ -7,10 +7,8 @@ import AddBookmarkForm from './components/AddBookmarkForm';
 import ImportModal from './components/ImportModal';
 import LoginView from './components/LoginView';
 
-import { Download, Upload, Plus, LogOut } from 'lucide-react';
-import { motion } from 'framer-motion';
-
-
+import { Download, Upload, Plus, LogOut, Search, User, Briefcase, Settings } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function App() {
   const auth = useAuth();
@@ -19,14 +17,13 @@ function App() {
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [selectedFolderId, setSelectedFolderId] = useState('root-' + (bookmarks.activeContext || 'perso'));
 
-
   if (auth.isLoading) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-[#0d1117]">
+      <div className="h-screen w-full flex items-center justify-center bg-slate-50">
         <motion.div 
           animate={{ rotate: 360 }}
           transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-          className="w-8 h-8 border-4 border-blue-500/30 border-t-blue-500 rounded-full"
+          className="w-8 h-8 border-4 border-slate-200 border-t-blue-600 rounded-full"
         />
       </div>
     );
@@ -35,8 +32,6 @@ function App() {
   if (!auth.isAuthenticated) {
     return <LoginView auth={auth} />;
   }
-
-
 
   const handleExport = () => {
     const blob = new Blob([bookmarks.exportData()], { type: 'application/json' });
@@ -48,19 +43,8 @@ function App() {
     URL.revokeObjectURL(url);
   };
 
-  const handleImport = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const data = JSON.parse(event.target.result);
-      bookmarks.importData(data);
-    };
-    reader.readAsText(file);
-  };
-
   return (
-    <div className={`flex h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] ${bookmarks.activeContext === 'pro' ? 'pro-theme' : 'perso-theme'}`}>
+    <div className="flex h-screen bg-slate-50 text-slate-900 font-sans">
       <Sidebar 
         bookmarks={bookmarks} 
         onSelectFolder={setSelectedFolderId}
@@ -68,56 +52,42 @@ function App() {
         onAddBookmark={() => setIsAddOpen(true)}
       />
 
-      
-      <main className="flex-1 flex flex-col overflow-hidden relative">
-        <header className="px-8 py-6 flex items-center justify-between border-b border-slate-200 bg-white/50 backdrop-blur-md sticky top-0 z-10">
-          <div className="flex flex-col">
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-              {bookmarks.activeContext === 'pro' ? 'Espace Professionnel' : 'Espace Personnel'}
-            </h2>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
-              {bookmarks.searchQuery ? `Résultats pour "${bookmarks.searchQuery}"` : 'Gestionnaire de ressources'}
-            </p>
+      <main className="flex-1 flex flex-col overflow-hidden">
+        {/* Top Navigation / Action Bar */}
+        <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between z-10">
+          <div className="flex-1 max-w-2xl relative group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={18} />
+            <input
+              type="text"
+              placeholder="Rechercher par titre, URL ou tag..."
+              value={bookmarks.searchQuery}
+              onChange={(e) => bookmarks.setSearchQuery(e.target.value)}
+              className="w-full bg-slate-50 border-none rounded-xl pl-12 pr-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500/10 transition-all placeholder:text-slate-400"
+            />
           </div>
-          
-          <div className="flex items-center gap-3">
+
+          <div className="flex items-center gap-4 ml-6">
             <button 
               onClick={() => setIsAddOpen(true)}
-              className="px-5 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all flex items-center gap-2 font-bold text-[10px] uppercase tracking-widest"
+              className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20"
             >
-              <Plus size={14} /> Nouveau
+              <Plus size={16} /> Ajouter
             </button>
-            
-            <div className="h-6 w-[1px] bg-slate-200 mx-2" />
-
-            <button 
-              onClick={handleExport}
-              title="Exporter JSON"
-              className="p-2.5 rounded-xl bg-white border border-slate-200 text-slate-500 hover:border-slate-300 transition-all"
-            >
-              <Download size={16} />
+            <div className="h-6 w-px bg-slate-200" />
+            <button onClick={handleExport} className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-all" title="Exporter">
+              <Download size={20} />
             </button>
-            
-            <button 
-              onClick={() => setIsImportOpen(true)}
-              title="Importer"
-              className="p-2.5 rounded-xl bg-white border border-slate-200 text-slate-500 hover:border-slate-300 transition-all"
-            >
-              <Upload size={16} />
+            <button onClick={() => setIsImportOpen(true)} className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-all" title="Importer">
+              <Upload size={20} />
             </button>
-
-            <button 
-              onClick={auth.logout}
-              title="Déconnexion"
-              className="p-2.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-500 hover:bg-rose-50 hover:text-rose-500 transition-all ml-2"
-            >
-              <LogOut size={16} />
+            <button onClick={auth.logout} className="p-2.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all" title="Déconnexion">
+              <LogOut size={20} />
             </button>
           </div>
         </header>
 
-
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
+        {/* Content Area */}
+        <div className="flex-1 overflow-y-auto px-8 py-8 bg-slate-50">
           <MainContent 
             bookmarks={bookmarks} 
             folderId={selectedFolderId}
@@ -125,29 +95,35 @@ function App() {
           />
         </div>
 
-
-        {isAddOpen && (
-          <AddBookmarkForm 
-            onClose={() => setIsAddOpen(false)}
-            onSubmit={(data) => {
-              bookmarks.addBookmark({ ...data, folderId: selectedFolderId });
-              setIsAddOpen(false);
-            }}
-            folders={bookmarks.folders}
-            defaultFolderId={selectedFolderId}
-          />
-        )}
-        {isImportOpen && (
-          <ImportModal 
-            context={bookmarks.activeContext}
-            onClose={() => setIsImportOpen(false)}
-            onImport={bookmarks.bulkImport}
-          />
-        )}
+        {/* Modals */}
+        <AnimatePresence>
+          {isAddOpen && (
+            <AddBookmarkForm 
+              onClose={() => setIsAddOpen(false)}
+              onSubmit={(data) => {
+                bookmarks.addBookmark({ ...data, folderId: selectedFolderId });
+                setIsAddOpen(false);
+              }}
+              folders={bookmarks.folders}
+              defaultFolderId={selectedFolderId}
+            />
+          )}
+          {isImportOpen && (
+            <ImportModal 
+              context={bookmarks.activeContext}
+              onClose={() => setIsImportOpen(false)}
+              onImport={bookmarks.bulkImport}
+            />
+          )}
+        </AnimatePresence>
       </main>
+
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        :root { font-family: 'Plus Jakarta Sans', sans-serif; }
+      `}</style>
     </div>
   );
 }
 
 export default App;
-

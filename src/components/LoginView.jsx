@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, LogIn, UserPlus, ArrowRight, Loader2, Bookmark, Sparkles, Globe, Layers, Zap } from 'lucide-react';
+import { Mail, Lock, LogIn, UserPlus, ArrowRight, Loader2, Bookmark, Info, AlertTriangle } from 'lucide-react';
 
 const LoginView = ({ auth }) => {
   const [email, setEmail] = useState('');
@@ -20,7 +20,7 @@ const LoginView = ({ auth }) => {
       
       if (success && isRegistering) {
         setIsRegistering(false);
-        auth.setError("Compte créé ! Vous pouvez maintenant vous connecter.");
+        auth.setError("Veuillez vérifier votre boîte mail pour confirmer votre inscription.");
       }
     } catch (err) {
       console.error(err);
@@ -30,116 +30,74 @@ const LoginView = ({ auth }) => {
   };
 
   return (
-    <div className="h-screen w-full flex bg-slate-50 overflow-hidden font-sans">
-      {/* Left Column: Visual & Brand */}
-      <div className="hidden lg:flex w-7/12 relative h-full overflow-hidden bg-slate-900">
-        <motion.div 
-           initial={{ scale: 1.1, opacity: 0 }}
-           animate={{ scale: 1, opacity: 1 }}
-           transition={{ duration: 1.5, ease: "easeOut" }}
-           className="absolute inset-0 z-0"
-        >
-          <img 
-            src="/assets/login-side.png" 
-            alt="Library" 
-            className="w-full h-full object-cover opacity-60"
-            onError={(e) => {
-              e.target.style.display = 'none';
-              e.target.parentElement.style.background = 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)';
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent" />
-        </motion.div>
-
-        <div className="relative z-10 w-full p-20 flex flex-col justify-between">
-          <div className="flex items-center gap-4">
-             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-xl shadow-blue-500/20">
-                <Bookmark className="text-white" size={20} />
-             </div>
-             <span className="text-lg font-extrabold text-white tracking-[0.2em] uppercase">Digital Saurien</span>
+    <div className="fixed inset-0 w-full h-full bg-slate-50 flex items-center justify-center overflow-auto p-6" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <main className="w-full max-w-[440px] flex flex-col items-center">
+        {/* Brand */}
+        <div className="flex flex-col items-center mb-10 text-center">
+          <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-600/30 text-white mb-6">
+            <Bookmark size={28} />
           </div>
-
-          <div className="max-w-xl">
-             <motion.h2 
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="text-6xl font-extrabold text-white leading-tight mb-8"
-             >
-                Organisez vos savoirs numérique.
-             </motion.h2>
-             <div className="grid grid-cols-2 gap-8">
-                <div className="space-y-3">
-                   <div className="flex items-center gap-2 text-blue-400 font-bold text-xs uppercase tracking-widest">
-                      <Layers size={14} /> Structure
-                   </div>
-                   <p className="text-slate-400 text-xs leading-relaxed">Arborescence récursive pour une gestion type bibliothèque.</p>
-                </div>
-                <div className="space-y-3">
-                   <div className="flex items-center gap-2 text-blue-400 font-bold text-xs uppercase tracking-widest">
-                      <Zap size={14} /> Synchro
-                   </div>
-                   <p className="text-slate-400 text-xs leading-relaxed">Synchronisation Cloud via Supabase pour tous vos postes.</p>
-                </div>
-             </div>
-          </div>
-
-          <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">Bookmarks Tracker &copy; 2024</p>
+          <h1 className="text-3xl font-extrabold text-[#0f172a] tracking-tighter">BookmarksTracker</h1>
+          <p className="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-[0.4em]">Digital Saurien Edition</p>
         </div>
-      </div>
 
-      {/* Right Column: Authentication Form */}
-      <div className="w-full lg:w-5/12 h-full flex items-center justify-center p-8 bg-white relative">
-        <div className="w-full max-w-sm">
-          <div className="mb-12">
-            <h1 className="text-3xl font-extrabold text-slate-900 mb-2">
-               {isRegistering ? "Rejoindre le Cloud" : "Bienvenue"}
-            </h1>
-            <p className="text-sm font-medium text-slate-500">
-               {isRegistering ? "Créez votre compte pour sauvegarder vos favoris." : "Connectez-vous pour accéder à votre bibliothèque."}
+        {/* Form Card */}
+        <div className="w-full bg-white rounded-[2.5rem] p-10 md:p-12 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] border border-slate-100">
+          <div className="mb-10 text-center">
+            <h2 className="text-xl font-bold text-[#0f172a]">
+              {isRegistering ? "Créer un accès" : "Connexion"}
+            </h2>
+            <p className="text-slate-400 text-xs font-semibold mt-2">
+              {isRegistering ? "Rejoignez la plateforme de curation." : "Accédez à votre bibliothèque sécurisée."}
             </p>
           </div>
 
-          {auth.error && (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className={`p-4 rounded-xl mb-8 text-xs font-bold border ${
-                auth.error.includes('créé') 
-                ? 'bg-emerald-50 border-emerald-100 text-emerald-600' 
-                : 'bg-rose-50 border-rose-100 text-rose-500'
-              }`}
-            >
-              {auth.error}
-            </motion.div>
-          )}
+          <AnimatePresence mode="wait">
+            {auth.error && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className={`p-4 rounded-2xl mb-8 text-[11px] font-bold border flex items-center gap-3 ${
+                  auth.error.includes('vérifier') 
+                  ? 'bg-emerald-50 border-emerald-100 text-emerald-700' 
+                  : 'bg-rose-50 border-rose-100 text-rose-600'
+                }`}
+              >
+                 {auth.error.includes('vérifier') ? <Info size={16} /> : <AlertTriangle size={16} />}
+                 <span className="flex-1">{auth.error}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest pl-1">Identifiant</label>
-              <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={18} />
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Email</label>
+              <div className="relative">
+                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input 
                   type="email" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-900 font-semibold text-sm"
-                  placeholder="votre@email.com"
+                  autoComplete="email"
+                  className="w-full pl-14 pr-6 py-4.5 bg-slate-50 border-2 border-slate-50 rounded-2xl outline-none focus:border-blue-600 focus:bg-white transition-all text-[#0f172a] font-bold text-sm"
+                  placeholder="name@company.com"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest pl-1">Mot de passe</label>
-              <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={18} />
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Mot de passe</label>
+              <div className="relative">
+                <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input 
                   type="password" 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-900 font-semibold text-sm"
+                  autoComplete="current-password"
+                  className="w-full pl-14 pr-6 py-4.5 bg-slate-50 border-2 border-slate-50 rounded-2xl outline-none focus:border-blue-600 focus:bg-white transition-all text-[#0f172a] font-bold text-sm"
                   placeholder="••••••••••••"
                 />
               </div>
@@ -148,39 +106,37 @@ const LoginView = ({ auth }) => {
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transform active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50 shadow-lg shadow-slate-900/10"
+              className="w-full h-14 bg-[#0f172a] text-white rounded-2xl font-bold text-xs uppercase tracking-[0.3em] hover:bg-slate-800 transform active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50 mt-4 shadow-xl shadow-slate-900/10"
             >
               {loading ? (
-                <Loader2 className="animate-spin" size={18} />
+                <Loader2 className="animate-spin" size={20} />
               ) : (
                 <>
-                  {isRegistering ? "Créer mon compte" : "Se connecter"}
+                  {isRegistering ? "S'inscrire" : "Se Connecter"}
                   <ArrowRight size={18} />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-12 pt-8 border-t border-slate-100 text-center">
-            <p className="text-sm text-slate-500 mb-4">
-              {isRegistering ? "Déjà membre ?" : "Nouveau ici ?"}
-            </p>
+          <div className="mt-10 pt-8 border-t border-slate-100 text-center">
             <button 
+              type="button"
               onClick={() => {
                 setIsRegistering(!isRegistering);
                 auth.setError(null);
               }}
-              className="px-6 py-2 rounded-lg border border-slate-200 text-slate-700 font-bold text-xs uppercase tracking-widest hover:bg-slate-50 transition-all"
+              className="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest hover:text-blue-700 transition-colors"
             >
-              {isRegistering ? "Se connecter" : "S'inscrire"}
+              {isRegistering ? "Déjà membre ? Connexion" : "Première fois ? Créer un compte"}
             </button>
           </div>
         </div>
-      </div>
 
-      <style jsx>{`
-         .font-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
-      `}</style>
+        <p className="text-[10px] font-bold text-slate-300 text-center mt-12 uppercase tracking-[0.5em] opacity-50">
+          Cloud Secure &bull; Digital Saurien
+        </p>
+      </main>
     </div>
   );
 };

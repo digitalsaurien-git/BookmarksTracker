@@ -205,6 +205,7 @@ const ImportModal = ({ onClose, onImport, context }) => {
               </button>
             </motion.div>
           )}
+        </div>
       </motion.div>
     </div>
   );

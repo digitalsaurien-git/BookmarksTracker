@@ -40,6 +40,11 @@ const BookmarkCard = ({ bookmark, onDelete, onIncrement }) => {
       </div>
 
       <div className="flex items-center gap-1">
+        {bookmark.clicks > 0 && (
+          <div className="mr-1 px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded-md text-[9.5px] font-black tracking-widest shadow-sm" title={`${bookmark.clicks} visites`}>
+            {bookmark.clicks}
+          </div>
+        )}
         <div className="relative">
           <button 
             onClick={() => setShowMenu(!showMenu)}

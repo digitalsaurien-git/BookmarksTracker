@@ -84,19 +84,34 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
              </span>
           </div>
 
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              if (window.confirm(`Supprimer le dossier "${folder.name}" et tout son contenu ?`)) {
-                bookmarks.deleteFolder(folder.id);
-              }
-            }}
-            className={`p-1.5 opacity-0 group-hover:opacity-100 rounded-lg transition-all ${
-              isSelected ? 'hover:bg-white/20 text-white' : 'hover:bg-rose-50 text-slate-300 hover:text-rose-500'
-            }`}
-          >
-            <Trash2 size={14} />
-          </button>
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                addFolder("Nouveau sous-dossier", folder.id);
+              }}
+              className={`p-1.5 rounded-lg transition-all ${
+                isSelected ? 'hover:bg-white/20 text-white' : 'hover:bg-blue-50 text-slate-300 hover:text-blue-500'
+              }`}
+              title="Nouveau sous-dossier"
+            >
+              <FolderPlus size={14} />
+            </button>
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                if (window.confirm(`Supprimer le dossier "${folder.name}" et tout son contenu ?`)) {
+                  bookmarks.deleteFolder(folder.id);
+                }
+              }}
+              className={`p-1.5 rounded-lg transition-all ${
+                isSelected ? 'hover:bg-white/20 text-white' : 'hover:bg-rose-50 text-slate-300 hover:text-rose-500'
+              }`}
+              title="Supprimer"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
         </div>
 
         <AnimatePresence>

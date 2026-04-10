@@ -41,9 +41,14 @@ const BookmarkCard = ({ bookmark, onDelete, onIncrement }) => {
 
       <div className="flex items-center gap-1">
         {bookmark.clicks > 0 && (
-          <div className="mr-1 px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded-md text-[9.5px] font-black tracking-widest shadow-sm" title={`${bookmark.clicks} visites`}>
+          <motion.div 
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="mr-1 px-1.5 py-0.5 bg-blue-600 text-white rounded-md text-[9px] font-black tracking-widest shadow-md shadow-blue-500/20" 
+            title={`${bookmark.clicks} visites`}
+          >
             {bookmark.clicks}
-          </div>
+          </motion.div>
         )}
         <div className="relative">
           <button 

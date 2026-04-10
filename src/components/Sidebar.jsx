@@ -3,11 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Folder, FolderOpen, ChevronRight, ChevronDown, 
   Library, Hash, Briefcase, User, MoreVertical,
-  PlusCircle, FolderPlus, Compass, Settings, Trash2
+  PlusCircle, FolderPlus, Compass, Settings, Trash2, Edit2
 } from 'lucide-react';
 
 const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
-  const { folders, activeContext, setContext, addFolder, moveFolder } = bookmarks;
+  const { folders, activeContext, setContext, addFolder, moveFolder, renameFolder } = bookmarks;
 
   const handleToggle = (id) => {
     bookmarks.toggleFolderExpand(id);
@@ -85,6 +85,19 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
           </div>
 
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                const newName = window.prompt("Nouveau nom du dossier :", folder.name);
+                if (newName && newName !== folder.name) renameFolder(folder.id, newName);
+              }}
+              className={`p-1.5 rounded-lg transition-all ${
+                isSelected ? 'hover:bg-white/20 text-white' : 'hover:bg-slate-100 text-slate-300 hover:text-slate-600'
+              }`}
+              title="Renommer"
+            >
+              <Edit2 size={14} />
+            </button>
             <button 
               onClick={(e) => {
                 e.stopPropagation();

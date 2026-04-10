@@ -104,6 +104,7 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 - **Importation Universelle** : Parseur Netscape supportant Chrome, Firefox, Safari.
 - **Synchronisation Cloud (Supabase)** : Persistance sécurisée multi-appareils.
 - **Expérience Bureau Class A** : Sidebar large (420px), barre de recherche centrale.
-- **Vignettes Minimalistes** : Format liste épuré (Icône planète + Titre + Flèche) pour une lecture rapide.
+- Tri intelligent : par ordre alphabétique ou par nombre de clics (popularité).
+- Tracking de clics : chaque ouverture de lien est comptabilisée pour identifier les ressources utiles.
 
 

@@ -182,6 +182,13 @@ export function useBookmarks(user) {
     });
   };
 
+  const renameFolder = (folderId, newName) => {
+    saveChanges({
+      ...data,
+      folders: data.folders.map(f => f.id === folderId ? { ...f, name: newName } : f)
+    });
+  };
+
   const addBookmark = (bookmark) => {
     const newBookmark = {
       id: 'bookmark-' + Date.now().toString(),
@@ -210,6 +217,13 @@ export function useBookmarks(user) {
     saveChanges({
       ...data,
       bookmarks: data.bookmarks.map(b => b.id === id ? { ...b, folderId: newFolderId } : b)
+    });
+  };
+
+  const incrementClickCount = (id) => {
+    saveChanges({
+      ...data,
+      bookmarks: data.bookmarks.map(b => b.id === id ? { ...b, clicks: (b.clicks || 0) + 1 } : b)
     });
   };
 
@@ -248,9 +262,11 @@ export function useBookmarks(user) {
     deleteFolder,
     toggleFolderExpand,
     moveFolder,
+    renameFolder,
     addBookmark,
     deleteBookmark,
     moveBookmark,
+    incrementClickCount,
     getBookmarkCount,
     searchQuery,
     setSearchQuery,

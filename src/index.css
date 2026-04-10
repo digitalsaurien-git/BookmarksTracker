@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
@@ -18,7 +22,6 @@
   --bg-primary: var(--background);
   --text-primary: var(--text-main);
 }
-
 
 * {
   box-sizing: border-box;
@@ -64,7 +67,7 @@ body {
 /* Ensure form visibility */
 input, select, textarea {
   font-family: inherit;
-  color: #0f172a !important; /* Force dark text for visibility */
+  color: #0f172a !important;
 }
 
 input::placeholder {

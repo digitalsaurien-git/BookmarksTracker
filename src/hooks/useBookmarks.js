@@ -182,6 +182,17 @@ export function useBookmarks(user) {
     setSearchQuery,
     isSyncing,
     importData: (newData) => saveChanges(newData),
-    exportData: () => JSON.stringify(data, null, 2)
+    exportData: () => JSON.stringify(data, null, 2),
+    bulkImport: async (importedFolders, importedBookmarks) => {
+      // Merge imported data with existing root folders if necessary
+      // But user said they have nothing, so we can potentially replace if empty
+      const newData = {
+        ...data,
+        folders: [...data.folders, ...importedFolders],
+        bookmarks: [...data.bookmarks, ...importedBookmarks]
+      };
+      await saveChanges(newData);
+    }
   };
 }
+

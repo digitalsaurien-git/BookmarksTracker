@@ -5,7 +5,9 @@ import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
 import SearchBar from './components/SearchBar';
 import AddBookmarkForm from './components/AddBookmarkForm';
+import ImportModal from './components/ImportModal';
 import LoginView from './components/LoginView';
+
 import { Download, Upload, Plus, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -15,7 +17,9 @@ function App() {
   const auth = useAuth();
   const bookmarks = useBookmarks(auth.user);
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const [selectedFolderId, setSelectedFolderId] = useState('root-' + (bookmarks.activeContext || 'perso'));
+
 
   if (auth.isLoading) {
     return (
@@ -88,10 +92,13 @@ function App() {
               <Download size={18} />
             </button>
             
-            <label className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer">
+            <button 
+              onClick={() => setIsImportOpen(true)}
+              title="Importer JSON"
+              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10"
+            >
               <Upload size={18} />
-              <input type="file" hidden onChange={handleImport} accept=".json" />
-            </label>
+            </button>
 
             <button 
               onClick={auth.logout}
@@ -120,6 +127,13 @@ function App() {
             }}
             folders={bookmarks.folders}
             defaultFolderId={selectedFolderId}
+          />
+        )}
+        {isImportOpen && (
+          <ImportModal 
+            context={bookmarks.activeContext}
+            onClose={() => setIsImportOpen(false)}
+            onImport={bookmarks.bulkImport}
           />
         )}
       </main>

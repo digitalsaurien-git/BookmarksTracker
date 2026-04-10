@@ -1,15 +1,24 @@
 import React, { useState } from 'react';
 import { useBookmarks } from './hooks/useBookmarks';
+import { useAuth } from './hooks/useAuth';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
 import SearchBar from './components/SearchBar';
 import AddBookmarkForm from './components/AddBookmarkForm';
-import { Download, Upload, Plus } from 'lucide-react';
+import LoginView from './components/LoginView';
+import { Download, Upload, Plus, LogOut } from 'lucide-react';
+
 
 function App() {
   const bookmarks = useBookmarks();
+  const auth = useAuth();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [selectedFolderId, setSelectedFolderId] = useState('root-' + bookmarks.activeContext);
+
+  if (!auth.isAuthenticated) {
+    return <LoginView auth={auth} />;
+  }
+
 
   const handleExport = () => {
     const blob = new Blob([bookmarks.exportData()], { type: 'application/json' });
@@ -66,7 +75,16 @@ function App() {
               <Upload size={18} />
               <input type="file" hidden onChange={handleImport} accept=".json" />
             </label>
+
+            <button 
+              onClick={auth.logout}
+              title="Déconnexion"
+              className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/10 text-red-400 ml-2"
+            >
+              <LogOut size={18} />
+            </button>
           </div>
+
         </header>
 
         <MainContent 

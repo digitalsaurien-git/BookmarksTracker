@@ -27,6 +27,8 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 - Déplacement de liens entre dossiers
 - Export/import de l’ensemble des bookmarks (fichier texte ou JSON)
 - Interface séparée Perso/Pro
+- Protection par mot de passe maître (Login/Initialisation)
+
 
 **OUT** (à exclure ou pour plus tard) :
 - Partage de bookmarks avec d’autres personnes
@@ -97,3 +99,31 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 - [ ] L’interface reste claire et rapide, sans menu caché inutile.
 - [ ] Je ne perds jamais de lien sans validation/confirmation.
 - [ ] Tout fonctionne sans connexion internet ou login.
+
+---
+
+## 11) Fonctionnalités développées (v1.0)
+- **Multi-Context (Perso/Pro)** : Séparation stricte des environnements avec thèmes visuels distincts (Indigo pour Pro, Lavender pour Perso).
+- **Gestion d'Arborescence** : Création, renommage (via UI) et suppression de dossiers et sous-dossiers.
+- **Bookmarks Visuels** : 
+    - Cartes riches avec récupération automatique de favicons.
+    - Affichage des titres et URLs tronqués pour la lisibilité.
+    - Système de tags colorés.
+- **Moteur de Recherche** : Filtrage instantané par titre, URL ou tags dans le contexte actif.
+- **Gestion des Liens** :
+    - Ajout rapide via formulaire modal.
+    - Déplacement facile entre dossiers via menu contextuel.
+    - Suppression sécurisée.
+- **Portabilité des Données** :
+    - Exportation complète au format JSON.
+    - Importation fluide avec restauration instantanée de la structure.
+- **Expérience Utilisateur (UX)** :
+    - Interface 100% Responsive et fluide.
+    - Animations fluides via Framer Motion.
+    - Persistance locale robuste via `localStorage`.
+- **Sécurité & Authentification** :
+    - Double mode : Initialisation du mot de passe maître ou Connexion.
+    - Hachage sécurisé (SHA-256) stocké localement.
+    - Interface premium centrée inspirée de SiteBar.
+
+

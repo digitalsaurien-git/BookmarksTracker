@@ -25,7 +25,10 @@
   
   --radius-md: 12px;
   --radius-lg: 16px;
+  
+  --login-glow: radial-gradient(circle at center, rgba(56, 139, 253, 0.15) 0%, transparent 70%);
 }
+
 
 * {
   box-sizing: border-box;
@@ -93,6 +96,89 @@ input:focus {
 .animate-fade-in {
   animation: fadeIn 0.3s ease-out forwards;
 }
+
+/* Login specific styles */
+.login-bg {
+  background: radial-gradient(circle at 20% 30%, rgba(56, 139, 253, 0.05) 0%, transparent 40%),
+              radial-gradient(circle at 80% 70%, rgba(188, 140, 255, 0.05) 0%, transparent 40%);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--login-glow);
+  pointer-events: none;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 2.5rem;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(13, 17, 23, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.dots-header {
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.dots-header span {
+  color: var(--accent-pro);
+  font-size: 1.2em;
+}
+
+.login-input-group {
+  margin-bottom: 1.5rem;
+}
+
+.login-input-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--accent-pro), var(--accent-perso));
+  color: white;
+  margin-top: 1rem;
+  box-shadow: 0 4px 15px rgba(56, 139, 253, 0.3);
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(56, 139, 253, 0.4);
+}
+
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {

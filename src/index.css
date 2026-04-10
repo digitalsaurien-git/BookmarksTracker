@@ -1,33 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Playfair+Display:wght@700;900&display=swap');
 
 :root {
-  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  --bg-color: #0d1117;
-  --panel-bg: rgba(22, 27, 34, 0.7);
-  --border-color: rgba(255, 255, 255, 0.1);
-  --text-primary: #e6edf3;
-  --text-secondary: #8b949e;
-  
-  --accent-pro: #388bfd;
-  --accent-perso: #bc8cff;
-  
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  
-  --login-glow: radial-gradient(circle at center, rgba(56, 139, 253, 0.15) 0%, transparent 70%);
+  --bg-primary: #faf7f2;
+  --bg-secondary: #efebe9;
+  --text-primary: #5d4037;
+  --text-secondary: #8d6e63;
+  --text-dim: #a1887f;
+  --accent-pro: #8d6e63;
+  --accent-perso: #c2ada7;
+  --border-light: rgba(93, 64, 55, 0.08);
+  --card-bg: #ffffff;
+  --radius-md: 16px;
+  --radius-lg: 24px;
 }
+
 
 
 * {
@@ -37,11 +23,13 @@
 }
 
 body {
-  background-color: var(--bg-color);
+  background-color: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
   overflow: hidden;
+  font-family: 'Inter', sans-serif;
 }
+
 
 #root {
   height: 100vh;
@@ -78,14 +66,15 @@ input:focus {
 }
 
 .pro-theme {
-  --accent-current: var(--accent-pro);
-  --accent-soft: rgba(56, 139, 253, 0.15);
+  --accent-current: #5d4037;
+  --accent-soft: rgba(93, 64, 55, 0.05);
 }
 
 .perso-theme {
-  --accent-current: var(--accent-perso);
-  --accent-soft: rgba(188, 140, 255, 0.15);
+  --accent-current: #8d6e63;
+  --accent-soft: rgba(141, 110, 99, 0.08);
 }
+
 
 /* Animations */
 @keyframes fadeIn {
@@ -180,6 +169,10 @@ input:focus {
 }
 
 /* Custom Scrollbar for Sidebar */
+.sidebar-beige {
+  background: linear-gradient(to bottom, var(--bg-primary), var(--bg-secondary));
+}
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
@@ -189,16 +182,19 @@ input:focus {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--border-light);
   border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--text-dim);
 }
 
 /* TreeView spacing */
-.folder-depth-1 { padding-left: 20px; }
+.folder-depth {
+  border-left: 1px solid var(--border-light);
+}
+
 .folder-depth-2 { padding-left: 40px; }
 .folder-depth-3 { padding-left: 60px; }
 

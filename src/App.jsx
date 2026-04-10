@@ -61,7 +61,7 @@ function App() {
   };
 
   return (
-    <div className={`flex h-screen bg-[#0d1117] text-white ${bookmarks.activeContext === 'pro' ? 'pro-theme' : 'perso-theme'}`}>
+    <div className={`flex h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] ${bookmarks.activeContext === 'pro' ? 'pro-theme' : 'perso-theme'}`}>
       <Sidebar 
         bookmarks={bookmarks} 
         onSelectFolder={setSelectedFolderId}
@@ -71,31 +71,38 @@ function App() {
 
       
       <main className="flex-1 flex flex-col overflow-hidden relative">
-        <header className="p-6 flex items-center justify-between glass border-b border-white/5">
-          <div className="flex-1 max-w-2xl">
-            <SearchBar value={bookmarks.searchQuery} onChange={bookmarks.setSearchQuery} />
+        <header className="px-8 py-6 flex items-center justify-between border-b border-[var(--border-light)] bg-white/30 backdrop-blur-xl">
+          <div className="flex flex-col">
+            <h2 className="text-xl font-black text-[var(--text-primary)] uppercase tracking-tight">
+              {bookmarks.activeContext === 'pro' ? 'Espace Professionnel' : 'Espace Personnel'}
+            </h2>
+            <p className="text-[10px] font-bold text-[var(--text-dim)] uppercase tracking-[0.2em]">
+              {bookmarks.searchQuery ? `Résultats pour "${bookmarks.searchQuery}"` : 'Toutes vos ressources'}
+            </p>
           </div>
           
-          <div className="flex items-center gap-3 ml-4">
+          <div className="flex items-center gap-4">
             <button 
               onClick={() => setIsAddOpen(true)}
-              className="px-4 py-2 rounded-lg bg-[var(--accent-current)] hover:opacity-90 flex items-center gap-2 font-medium"
+              className="px-6 py-3 rounded-2xl bg-[var(--accent-current)] text-white hover:opacity-90 shadow-lg shadow-[var(--accent-current)]/20 transition-all flex items-center gap-2 font-black text-xs uppercase tracking-widest"
             >
-              <Plus size={18} /> Ajouter
+              <Plus size={18} /> Nouveau Favori
             </button>
             
+            <div className="h-8 w-[1px] bg-[var(--border-light)] mx-2" />
+
             <button 
               onClick={handleExport}
               title="Exporter JSON"
-              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10"
+              className="p-3 rounded-2xl bg-white border border-[var(--border-light)] text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] transition-all shadow-sm"
             >
               <Download size={18} />
             </button>
             
             <button 
               onClick={() => setIsImportOpen(true)}
-              title="Importer JSON"
-              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10"
+              title="Importer SiteBar / HTML"
+              className="p-3 rounded-2xl bg-white border border-[var(--border-light)] text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] transition-all shadow-sm"
             >
               <Upload size={18} />
             </button>
@@ -103,7 +110,7 @@ function App() {
             <button 
               onClick={auth.logout}
               title="Déconnexion"
-              className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/10 text-red-400 ml-2"
+              className="p-3 rounded-2xl bg-red-50 border border-red-100 text-red-400 hover:bg-red-100 transition-all shadow-sm"
             >
               <LogOut size={18} />
             </button>
@@ -111,11 +118,13 @@ function App() {
 
         </header>
 
-        <MainContent 
-          bookmarks={bookmarks} 
-          folderId={selectedFolderId}
-          onAdd={() => setIsAddOpen(true)}
-        />
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
+          <MainContent 
+            bookmarks={bookmarks} 
+            folderId={selectedFolderId}
+            onAdd={() => setIsAddOpen(true)}
+          />
+        </div>
 
 
         {isAddOpen && (
@@ -137,32 +146,9 @@ function App() {
           />
         )}
       </main>
-      
-      <style jsx>{`
-        .flex { display: flex; }
-        .h-screen { height: 100vh; }
-        .flex-1 { flex: 1; }
-        .flex-col { flex-direction: column; }
-        .overflow-hidden { overflow: hidden; }
-        .relative { position: relative; }
-        .p-6 { padding: 1.5rem; }
-        .items-center { align-items: center; }
-        .justify-between { justify-content: space-between; }
-        .max-w-2xl { max-width: 42rem; }
-        .ml-4 { margin-left: 1rem; }
-        .gap-3 { gap: 0.75rem; }
-        .px-4 { padding-left: 1rem; padding-right: 1rem; }
-        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-        .rounded-lg { border-radius: 0.5rem; }
-        .font-medium { font-weight: 500; }
-        .p-2 { padding: 0.5rem; }
-        .border-b { border-bottom-width: 1px; }
-        .cursor-pointer { cursor: pointer; }
-        .border { border-width: 1px; }
-        .hidden { display: none; }
-      `}</style>
     </div>
   );
 }
 
 export default App;
+

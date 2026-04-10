@@ -6,79 +6,80 @@ const BookmarkCard = ({ bookmark, onDelete, folders, onMove }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showMoveMenu, setShowMoveMenu] = useState(false);
 
-  const faviconUrl = `https://www.google.com/s2/favicons?domain=${new URL(bookmark.url).hostname}&sz=64`;
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    onDelete();
+  };
 
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      whileHover={{ y: -5 }}
-      className="glass rounded-2xl p-5 border border-white/5 hover:border-[var(--accent-current)]/30 transition-all group"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="group bg-white p-5 rounded-3xl border border-[var(--border-light)] shadow-sm hover:shadow-xl hover:shadow-[#5d4037]/5 transition-all duration-300 relative overflow-hidden"
     >
-      <div className="flex items-start justify-between mb-4">
-        <div className="w-12 h-12 rounded-xl bg-white/5 p-2 flex items-center justify-center border border-white/10 group-hover:bg-white/10 transition-colors">
+      <div className="flex gap-4">
+        <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center relative overflow-hidden group-hover:bg-[var(--accent-soft)] transition-colors">
           <img 
-            src={faviconUrl} 
-            alt="favicon" 
-            className="w-full h-full object-contain"
-            onError={(e) => { e.target.src = 'https://lucide.dev/favicon.ico'; }}
+            src={`https://www.google.com/s2/favicons?domain=${new URL(bookmark.url).hostname}&sz=64`}
+            alt=""
+            className="w-6 h-6 z-10"
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.nextSibling.style.display = 'flex';
+            }}
           />
+          <div className="hidden absolute inset-0 items-center justify-center text-[var(--accent-current)]">
+            <ExternalLink size={20} />
+          </div>
         </div>
-        
-        <div className="relative">
-          <button 
-            onClick={() => setShowMenu(!showMenu)}
-            className="p-2 text-gray-500 hover:text-white rounded-lg hover:bg-white/5"
-          >
-            <MoreVertical size={18} />
-          </button>
+
+        <div className="flex-1 min-w-0 pr-10">
+          <h3 className="text-sm font-black text-[var(--text-primary)] truncate mb-1 group-hover:text-[var(--accent-current)] transition-colors">
+            {bookmark.title}
+          </h3>
+          <p className="text-xs text-[var(--text-dim)] truncate mb-3">
+            {new URL(bookmark.url).hostname}
+          </p>
           
-          {showMenu && (
-            <div className="absolute right-0 mt-2 w-48 glass border border-white/10 rounded-xl shadow-2xl z-20 py-1 overflow-hidden">
-              <button 
-                onClick={() => { setShowMoveMenu(true); setShowMenu(false); }}
-                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white"
-              >
-                <MoveHorizontal size={14} /> Déplacer
-              </button>
-              <button 
-                onClick={onDelete}
-                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-400 hover:bg-red-400/10"
-              >
-                <Trash2 size={14} /> Supprimer
-              </button>
+          {bookmark.description && (
+            <p className="text-[11px] text-[var(--text-secondary)] line-clamp-2 leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity">
+              {bookmark.description}
+            </p>
+          )}
+          {bookmark.tags?.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-3">
+              {bookmark.tags.map(tag => (
+                <span key={tag} className="text-[9px] font-black px-2 py-0.5 bg-[var(--bg-secondary)] text-[var(--text-dim)] rounded-full uppercase tracking-wider">
+                  {tag}
+                </span>
+              ))}
             </div>
           )}
         </div>
       </div>
 
-      <div className="mb-4">
-        <h3 className="font-semibold text-white line-clamp-1 mb-1 group-hover:text-[var(--accent-current)] transition-colors">
-          {bookmark.title}
-        </h3>
-        <a 
-          href={bookmark.url} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="text-gray-500 text-xs truncate block hover:text-gray-300 flex items-center gap-1"
+      <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+        <button 
+          onClick={() => window.open(bookmark.url, '_blank')}
+          className="p-2 bg-[var(--bg-primary)] text-[var(--text-secondary)] hover:text-[var(--accent-current)] rounded-xl transition-colors shadow-sm"
         >
-          {bookmark.url}
-          <ExternalLink size={10} />
-        </a>
+          <ExternalLink size={16} />
+        </button>
+        <button 
+          onClick={handleDelete}
+          className="p-2 bg-red-50 text-red-400 hover:bg-red-500 hover:text-white rounded-xl transition-all shadow-sm"
+        >
+          <Trash2 size={16} />
+        </button>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {bookmark.tags.map((tag, index) => (
-          <span 
-            key={index} 
-            className="px-2 py-0.5 rounded-md bg-white/5 text-[10px] text-gray-400 border border-white/5 flex items-center gap-1"
-          >
-            <Tag size={8} /> {tag}
-          </span>
-        ))}
-      </div>
+      {bookmark.private && (
+        <div className="absolute top-0 right-0 p-1 bg-amber-100/50 text-amber-600">
+          <span className="text-[8px] font-black">PRIVATE</span>
+        </div>
+      )}
+
 
       {showMoveMenu && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">

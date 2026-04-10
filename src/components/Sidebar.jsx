@@ -3,14 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Folder, FolderOpen, ChevronRight, ChevronDown, 
   Library, Hash, Briefcase, User, MoreVertical,
-  PlusCircle, FolderPlus, Compass, Settings
+  PlusCircle, FolderPlus, Compass, Settings, Trash2
 } from 'lucide-react';
 
 const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
   const { folders, activeContext, setContext, addFolder } = bookmarks;
 
   const handleToggle = (id) => {
-    bookmarks.updateFolder(id, { isExpanded: !folders.find(f => f.id === id)?.isExpanded });
+    bookmarks.toggleFolderExpand(id);
   };
 
   const getSubfolders = (parentId) => {
@@ -50,6 +50,22 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
                {folder.name}
              </span>
           </div>
+
+          {!folder.id.startsWith('root-') && (
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                if (window.confirm(`Supprimer le dossier "${folder.name}" et tout son contenu ?`)) {
+                  bookmarks.deleteFolder(folder.id);
+                }
+              }}
+              className={`p-1.5 opacity-0 group-hover:opacity-100 rounded-lg transition-all ${
+                isSelected ? 'hover:bg-white/20 text-white' : 'hover:bg-rose-50 text-slate-300 hover:text-rose-500'
+              }`}
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
         </div>
 
         <AnimatePresence>
@@ -143,7 +159,7 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
           </div>
 
           <div className="mt-10 pt-6 border-t border-slate-50 space-y-2">
-            {folders.filter(f => !f.parentId || f.parentId.startsWith('root-')).filter(f => f.type === activeContext).map(folder => (
+            {folders.filter(f => f.parentId === `root-${activeContext}`).map(folder => (
               <FolderItem key={folder.id} folder={folder} />
             ))}
           </div>

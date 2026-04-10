@@ -13,6 +13,15 @@ const MainContent = ({ bookmarks, folderId, onAdd }) => {
     temp = bookmarks.folders.find(f => f.id === temp.parentId);
   }
 
+  // Helper to get all descendant folder IDs
+  const getDescendantFolderIds = (id) => {
+    const children = bookmarks.folders.filter(f => f.parentId === id);
+    return [id, ...children.flatMap(f => getDescendantFolderIds(f.id))];
+  };
+
+  const relevantFolderIds = getDescendantFolderIds(folderId);
+  const folderBookmarks = bookmarks.bookmarks.filter(b => relevantFolderIds.includes(b.folderId));
+
   if (folderBookmarks.length === 0 && !bookmarks.searchQuery) {
     return (
       <div className="flex flex-col items-center justify-center py-32 text-center animate-fade-in">

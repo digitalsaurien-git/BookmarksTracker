@@ -1,123 +1,86 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ExternalLink, Trash2, MoreVertical, MoveHorizontal, Tag, Globe, Link } from 'lucide-react';
+import React from 'react';
+import { ExternalLink, MoreVertical, Trash2, Move, Clock, Globe } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-const BookmarkCard = ({ bookmark, onDelete, folders, onMove }) => {
-  const [showOptions, setShowOptions] = useState(false);
-  const [showMoveMenu, setShowMoveMenu] = useState(false);
-
-  const hostname = new URL(bookmark.url).hostname;
+const BookmarkCard = ({ bookmark, onDelete, onMove }) => {
+  const [showMenu, setShowMenu] = React.useState(false);
+  
+  // Extract domain for a cleaner look
+  const getDomain = (url) => {
+    try {
+      return new URL(url).hostname.replace('www.', '');
+    } catch {
+      return url;
+    }
+  };
 
   return (
-    <motion.div
+    <motion.div 
       layout
-      className="bg-white rounded-2xl border border-slate-200 p-5 hover:border-blue-300 hover:shadow-xl hover:shadow-blue-500/5 transition-all group relative flex flex-col h-full"
+      className="premium-card p-6 flex flex-col h-full group"
     >
-      <div className="flex gap-4 mb-4 items-start">
-        <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 flex-shrink-0 group-hover:bg-blue-50 transition-colors">
-          <img 
-            src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=64`}
-            alt=""
-            className="w-5 h-5"
-            onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }}
-          />
-          <Link size={18} className="hidden text-blue-500" />
+      <div className="flex items-start justify-between mb-6">
+        <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 shadow-sm">
+          <Globe size={20} />
         </div>
         
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-bold text-slate-900 truncate group-hover:text-blue-600 transition-colors mb-0.5">
-            {bookmark.title}
-          </h3>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-             {hostname}
-          </p>
-        </div>
-
         <div className="relative">
           <button 
-            onClick={() => setShowOptions(!showOptions)}
-            className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all"
+            onClick={() => setShowMenu(!showMenu)}
+            className="p-2 text-slate-300 hover:text-slate-900 rounded-xl hover:bg-slate-50 transition-colors"
           >
-            <MoreVertical size={16} />
+            <MoreVertical size={20} />
           </button>
           
-          <AnimatePresence>
-            {showOptions && (
-              <motion.div 
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 5 }}
-                className="absolute right-0 mt-2 w-40 bg-white border border-slate-200 shadow-2xl rounded-xl py-2 z-10"
-              >
+          {showMenu && (
+            <>
+              <div 
+                className="fixed inset-0 z-10" 
+                onClick={() => setShowMenu(false)}
+              />
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-100 rounded-2xl shadow-xl z-20 py-2 overflow-hidden animate-fade-in">
                 <button 
-                  onClick={() => { window.open(bookmark.url, '_blank'); setShowOptions(false); }}
-                  className="w-full text-left px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 flex items-center gap-2"
+                  onClick={() => { onMove(bookmark.id); setShowMenu(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-[13px] font-bold text-slate-600 hover:bg-slate-50 transition-colors"
                 >
-                  <ExternalLink size={14} /> Ouvrir
+                  <Move size={16} /> Déplacer
                 </button>
                 <button 
-                  onClick={() => { setShowMoveMenu(true); setShowOptions(false); }}
-                  className="w-full text-left px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 flex items-center gap-2"
+                  onClick={() => { onDelete(bookmark.id); setShowMenu(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-[13px] font-bold text-rose-500 hover:bg-rose-50 transition-colors"
                 >
-                  <MoveHorizontal size={14} /> Déplacer
+                  <Trash2 size={16} /> Supprimer
                 </button>
-                <div className="h-px bg-slate-100 my-1" />
-                <button 
-                  onClick={() => { onDelete(); setShowOptions(false); }}
-                  className="w-full text-left px-4 py-2 text-xs font-semibold text-rose-500 hover:bg-rose-50 flex items-center gap-2"
-                >
-                  <Trash2 size={14} /> Supprimer
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
-      <div className="flex-1">
-        {bookmark.description && (
-          <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-4">
-            {bookmark.description}
-          </p>
-        )}
+      <div className="flex-1 min-w-0 mb-8">
+        <h3 className="text-[17px] font-extrabold text-slate-900 leading-tight mb-2 line-clamp-2">
+          {bookmark.title || 'Sans titre'}
+        </h3>
+        <p className="text-[14px] font-medium text-slate-400 line-clamp-2 leading-relaxed">
+          {bookmark.description || 'Aucune description disponible pour ce favori.'}
+        </p>
       </div>
 
-      <div className="flex flex-wrap gap-1 mt-auto pt-4">
-        {bookmark.tags?.map(tag => (
-          <span key={tag} className="text-[9px] font-bold px-2 py-0.5 bg-slate-100 text-slate-500 rounded uppercase tracking-wider">
-            {tag}
-          </span>
-        ))}
+      <div className="pt-6 border-t border-slate-50 flex items-center justify-between mt-auto">
+        <div className="flex items-center gap-2 text-[11px] font-black text-slate-300 uppercase tracking-widest">
+          <Clock size={12} />
+          {getDomain(bookmark.url)}
+        </div>
+        
+        <a 
+          href={bookmark.url} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white hover:scale-110 active:scale-95 transition-all duration-300 shadow-sm"
+        >
+          <ExternalLink size={16} />
+        </a>
       </div>
-
-      <AnimatePresence>
-        {showMoveMenu && (
-          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowMoveMenu(false)}>
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="bg-white w-full max-w-sm rounded-2xl p-8 shadow-2xl"
-              onClick={e => e.stopPropagation()}
-            >
-              <h3 className="text-lg font-bold text-slate-900 mb-6">Déplacer vers...</h3>
-              <div className="space-y-1.5 max-h-60 overflow-y-auto px-1 custom-scrollbar">
-                {folders.map(folder => (
-                  <button
-                    key={folder.id}
-                    onClick={() => { onMove(folder.id); setShowMoveMenu(false); }}
-                    className={`w-full text-left px-4 py-3 rounded-xl text-xs font-bold transition-all ${
-                      bookmark.folderId === folder.id ? 'bg-blue-600 text-white' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
-                    }`}
-                  >
-                    {folder.name}
-                  </button>
-                ))}
-              </div>
-              <button onClick={() => setShowMoveMenu(false)} className="w-full mt-6 py-2 text-xs font-bold text-slate-400">Annuler</button>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 };

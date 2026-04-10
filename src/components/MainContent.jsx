@@ -4,7 +4,6 @@ import { ChevronRight, LayoutGrid, Layers, Ghost, Sparkles } from 'lucide-react'
 
 const MainContent = ({ bookmarks, folderId, onAdd }) => {
   const currentFolder = bookmarks.folders.find(f => f.id === folderId);
-  const folderBookmarks = bookmarks.bookmarks.filter(b => b.folderId === folderId);
   
   const folderPath = [];
   let temp = currentFolder;

@@ -14,10 +14,17 @@ const BookmarkCard = ({ bookmark, onDelete, onMove }) => {
     }
   };
 
+  const onDragStart = (e) => {
+    e.dataTransfer.setData("bookmarkId", bookmark.id);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
   return (
     <motion.div 
       layout
-      className="premium-card p-6 flex flex-col h-full group"
+      draggable
+      onDragStart={onDragStart}
+      className="premium-card p-6 flex flex-col h-full group cursor-grab active:cursor-grabbing"
     >
       <div className="flex items-start justify-between mb-6">
         <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 shadow-sm">

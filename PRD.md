@@ -24,7 +24,8 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 - Ajout/suppression/édition de bookmarks
 - Tags sur chaque bookmark
 - Recherche en texte libre sur liens et tags
-- Déplacement de liens entre dossiers
+- Déplacement de liens entre dossiers (Drag & Drop)
+- Déplacement de dossiers (Drag & Drop) pour restructurer la hiérarchie
 - Export/import de l’ensemble des bookmarks (fichier texte ou JSON)
 - Séparation espace Perso et Boulot via toggle (mais sans dossiers racines "clutter")
 - Protection par mot de passe maître (Login/Initialisation)
@@ -75,7 +76,7 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 2. **Arborescence Propre** : Les dossiers racines redondants "Favoris Perso/Pro" sont supprimés ; le contenu remonte directement au premier niveau.
 3. **Ajout et affichage de bookmarks** : Peut ajouter un bookmark (champ + bouton) et il apparaît dans le dossier choisi.
 4. **Tag & recherche** : Peut assigner un tag lors de l’ajout, puis retrouve le lien via un champ de recherche.
-5. **Déplacement** : Peut déplacer un lien d’un dossier à un autre sans recharger la page.
+5. **Déplacement & Restructuration** : Peut déplacer un lien ou un dossier entier par glisser-déposer (Drag & Drop) vers un nouveau dossier ou vers la racine.
 6. **Export/import** : Peut sauvegarder tous ses bookmarks en un clic (fichier téléchargé) et réimporter ce fichier pour retrouver la structure.
 7. **Migration** : Les anciens dossiers "Perso" et "Pro" sont aplatis lors de la première utilisation.
 

@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 
 const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
-  const { folders, activeContext, setContext, addFolder } = bookmarks;
+  const { folders, activeContext, setContext, addFolder, moveFolder } = bookmarks;
 
   const handleToggle = (id) => {
     bookmarks.toggleFolderExpand(id);
@@ -17,14 +17,47 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
     return folders.filter(f => f.parentId === parentId);
   };
 
+  const onDragStart = (e, folderId) => {
+    e.dataTransfer.setData("folderId", folderId);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const onDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const onDrop = (e, targetParentId) => {
+    e.preventDefault();
+    const draggedFolderId = e.dataTransfer.getData("folderId");
+    const draggedBookmarkId = e.dataTransfer.getData("bookmarkId");
+
+    if (draggedFolderId) {
+      if (draggedFolderId !== targetParentId) {
+        moveFolder(draggedFolderId, targetParentId);
+      }
+    } else if (draggedBookmarkId) {
+      bookmarks.moveBookmark(draggedBookmarkId, targetParentId);
+    }
+  };
+
   const FolderItem = ({ folder, level = 0 }) => {
     const isSelected = selectedFolderId === folder.id;
     const isExpanded = folder.isExpanded;
     const hasChildren = getSubfolders(folder.id).length > 0;
 
     return (
-      <div className="mb-2">
+      <div 
+        className="mb-2"
+        onDragOver={onDragOver}
+        onDrop={(e) => {
+          e.stopPropagation();
+          onDrop(e, folder.id);
+        }}
+      >
         <div 
+          draggable
+          onDragStart={(e) => onDragStart(e, folder.id)}
           className={`group flex items-center px-5 py-3 rounded-2xl transition-all cursor-pointer ${
             isSelected ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/10 scale-[1.02]' : 'hover:bg-slate-50 text-slate-600'
           }`}
@@ -144,6 +177,8 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
         
         <div className="space-y-2">
           <div 
+            onDragOver={onDragOver}
+            onDrop={(e) => onDrop(e, null)}
             onClick={() => onSelectFolder(null)}
             className={`flex items-center gap-4 px-5 py-4 rounded-2xl cursor-pointer transition-all ${
               selectedFolderId === null 

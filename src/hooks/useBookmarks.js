@@ -197,6 +197,14 @@ export function useBookmarks(user) {
     });
   };
 
+  const moveFolder = (folderId, newParentId) => {
+    if (folderId === newParentId) return;
+    saveChanges({
+      ...data,
+      folders: data.folders.map(f => f.id === folderId ? { ...f, parentId: newParentId } : f)
+    });
+  };
+
   const getBookmarkCount = (folderId) => {
     const childFolders = data.folders.filter(f => f.parentId === folderId);
     const subCount = childFolders.reduce((sum, f) => sum + getBookmarkCount(f.id), 0);
@@ -223,6 +231,7 @@ export function useBookmarks(user) {
     addFolder,
     deleteFolder,
     toggleFolderExpand,
+    moveFolder,
     addBookmark,
     deleteBookmark,
     moveBookmark,

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Folder, FolderOpen, ChevronRight, ChevronDown, 
   Library, Hash, Briefcase, User, MoreVertical,
-  PlusCircle, FolderPlus
+  PlusCircle, FolderPlus, Compass, Settings
 } from 'lucide-react';
 
 const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
@@ -23,10 +23,10 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
     const hasChildren = getSubfolders(folder.id).length > 0;
 
     return (
-      <div className="mb-1">
+      <div className="mb-2">
         <div 
-          className={`group flex items-center px-4 py-2.5 rounded-xl transition-all cursor-pointer ${
-            isSelected ? 'bg-blue-50 text-blue-700 shadow-sm' : 'hover:bg-slate-50 text-slate-600'
+          className={`group flex items-center px-5 py-3 rounded-2xl transition-all cursor-pointer ${
+            isSelected ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/10 scale-[1.02]' : 'hover:bg-slate-50 text-slate-600'
           }`}
           style={{ marginLeft: `${level * 16}px` }}
           onClick={() => onSelectFolder(folder.id)}
@@ -38,15 +38,15 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
                 handleToggle(folder.id);
               }
             }}
-            className="w-6 h-6 flex items-center justify-center text-slate-300 hover:text-slate-500 rounded-md transition-colors"
+            className="w-5 h-5 flex items-center justify-center text-slate-300 group-hover:text-slate-500 rounded-md transition-colors"
           >
-            {hasChildren && (isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />)}
+            {hasChildren && (isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />)}
           </div>
-          <div className="flex-1 flex items-center gap-3">
-             <div className={`${isSelected ? 'text-blue-500' : 'text-slate-400 opacity-60'}`}>
+          <div className="flex-1 flex items-center gap-4 min-w-0">
+             <div className={`${isSelected ? 'text-blue-400' : 'text-slate-400 opacity-60'}`}>
                 {isExpanded ? <FolderOpen size={18} /> : <Folder size={18} />}
              </div>
-             <span className={`text-[13px] font-bold truncate ${isSelected ? 'text-blue-700' : 'text-slate-700'}`}>
+             <span className={`text-[13px] font-black truncate leading-none ${isSelected ? 'text-white' : 'text-slate-700'}`}>
                {folder.name}
              </span>
           </div>
@@ -58,10 +58,10 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden"
+              className="overflow-hidden border-l border-slate-100 ml-7 mt-1"
             >
               {getSubfolders(folder.id).map(f => (
-                <FolderItem key={f.id} folder={f} level={level + 1} />
+                <FolderItem key={f.id} folder={f} level={0} />
               ))}
             </motion.div>
           )}
@@ -71,28 +71,28 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
   };
 
   return (
-    <div className="flex-1 flex flex-col p-8 custom-scrollbar">
+    <div className="flex-1 flex flex-col p-10 custom-scrollbar bg-white">
       {/* Brand & Context Switch */}
-      <div className="mb-12">
-        <div className="flex items-center gap-4 mb-10">
-          <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-xl shadow-slate-900/10">
-            <Library size={22} />
+      <div className="mb-14">
+        <div className="flex items-center gap-5 mb-12">
+          <div className="w-12 h-12 bg-slate-900 rounded-[1.25rem] flex items-center justify-center text-white shadow-2xl shadow-slate-900/20">
+            <Library size={24} strokeWidth={2.5} />
           </div>
           <div>
-            <h1 className="text-lg font-black tracking-tight leading-none text-slate-900">Bibliothèque</h1>
-            <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest mt-1 block">Digital Saurien</span>
+            <h1 className="text-xl font-black tracking-tight leading-none text-slate-900">Bibliothèque</h1>
+            <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest mt-1.5 block">Digital Saurien</span>
           </div>
         </div>
 
-        <div className="bg-slate-50 p-1.5 rounded-2xl flex items-center gap-1 border border-slate-100 shadow-inner">
+        <div className="bg-slate-50 p-1.5 rounded-[1.5rem] flex items-center gap-1.5 border border-slate-100/50">
           <button 
             onClick={() => {
               setContext('perso');
               onSelectFolder('root-perso');
             }}
-            className={`flex-1 flex items-center justify-center gap-2.5 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
+            className={`flex-1 flex items-center justify-center gap-2.5 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
               activeContext === 'perso' 
-                ? 'bg-white text-blue-600 shadow-md ring-1 ring-slate-100' 
+                ? 'bg-white text-blue-600 shadow-sm border border-slate-100' 
                 : 'text-slate-400 hover:text-slate-600'
             }`}
           >
@@ -103,9 +103,9 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
               setContext('pro');
               onSelectFolder('root-pro');
             }}
-            className={`flex-1 flex items-center justify-center gap-2.5 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
+            className={`flex-1 flex items-center justify-center gap-2.5 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
               activeContext === 'pro' 
-                ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20' 
+                ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/10' 
                 : 'text-slate-400 hover:text-slate-600'
             }`}
           >
@@ -116,35 +116,45 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
 
       {/* Folders List */}
       <div className="flex-1">
-        <div className="flex items-center justify-between mb-6 px-1">
-          <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Dossiers</h3>
+        <div className="flex items-center justify-between mb-8 px-2">
+          <div className="flex items-center gap-3">
+            <Compass size={14} className="text-slate-300" />
+            <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Explorateur</h3>
+          </div>
           <button 
             onClick={() => addFolder("Nouveau dossier", activeContext, `root-${activeContext}`)}
-            className="text-slate-300 hover:text-blue-500 transition-colors"
+            className="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-blue-500 hover:bg-slate-50 rounded-lg transition-all"
           >
-            <FolderPlus size={16} />
+            <FolderPlus size={18} />
           </button>
         </div>
         
-        <div className="space-y-1">
+        <div className="space-y-2">
           <div 
             onClick={() => onSelectFolder(`root-${activeContext}`)}
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all ${
+            className={`flex items-center gap-4 px-5 py-4 rounded-2xl cursor-pointer transition-all ${
               selectedFolderId === `root-${activeContext}` 
-                ? 'bg-blue-50 text-blue-700 shadow-sm' 
-                : 'hover:bg-slate-50 text-slate-500'
+                ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/10' 
+                : 'hover:bg-slate-50 text-slate-600'
             }`}
           >
-            <Hash size={16} className="opacity-40" />
-            <span className="text-[13px] font-bold">Tous les favoris</span>
+            <Hash size={18} className={selectedFolderId === `root-${activeContext}` ? 'text-blue-400' : 'opacity-30'} />
+            <span className={`text-[13px] font-black leading-none ${selectedFolderId === `root-${activeContext}` ? 'text-white' : 'text-slate-700'}`}>Tous les favoris</span>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-slate-50">
+          <div className="mt-10 pt-6 border-t border-slate-50 space-y-2">
             {folders.filter(f => !f.parentId || f.parentId.startsWith('root-')).filter(f => f.type === activeContext).map(folder => (
               <FolderItem key={folder.id} folder={folder} />
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Bottom Actions */}
+      <div className="mt-auto pt-10 px-2 flex items-center justify-between border-t border-slate-50">
+        <button className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-colors">
+          <Settings size={14} /> Préférences
+        </button>
       </div>
     </div>
   );

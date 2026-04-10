@@ -116,6 +116,7 @@ function App() {
           )}
           {isImportOpen && (
             <ImportModal 
+              context={bookmarks.activeContext}
               onClose={() => setIsImportOpen(false)}
               onImport={bookmarks.bulkImport}
             />

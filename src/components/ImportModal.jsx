@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Upload, FileJson, CheckCircle2, AlertTriangle, Loader2, Sparkles, Files } from 'lucide-react';
 
-const ImportModal = ({ onClose, onImport }) => {
+const ImportModal = ({ onClose, onImport, context }) => {
   const [file, setFile] = useState(null);
   const [isParsing, setIsParsing] = useState(false);
   const [stats, setStats] = useState(null);
@@ -34,6 +34,7 @@ const ImportModal = ({ onClose, onImport }) => {
               id: folderId,
               name: h3.textContent,
               parentId: parentId,
+              type: context,
               isExpanded: false
             });
             
@@ -50,6 +51,7 @@ const ImportModal = ({ onClose, onImport }) => {
               url: a.getAttribute('href'),
               description: a.getAttribute('note') || a.getAttribute('comment') || '',
               folderId: parentId,
+              type: context,
               createdAt: new Date().toISOString()
             });
           }
@@ -73,6 +75,7 @@ const ImportModal = ({ onClose, onImport }) => {
               title: a.textContent,
               url: a.getAttribute('href'),
               folderId: rootId,
+              type: context,
               createdAt: new Date().toISOString()
            });
         });
@@ -130,7 +133,7 @@ const ImportModal = ({ onClose, onImport }) => {
             </div>
             <div>
               <h2 className="text-xl font-extrabold text-slate-900">Importation</h2>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Favoris Externes</p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Espace {context}</p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 text-slate-300 hover:text-slate-900 rounded-xl hover:bg-white transition-colors">
@@ -190,7 +193,7 @@ const ImportModal = ({ onClose, onImport }) => {
 
               <div className="p-6 bg-emerald-50 border border-emerald-100 rounded-3xl flex items-center gap-4 text-emerald-700">
                 <CheckCircle2 size={24} />
-                <p className="text-sm font-bold">Fichier validé. {stats.bookmarkCount} liens vont être ajoutés à votre bibliothèque.</p>
+                <p className="text-sm font-bold">Fichier validé. {stats.bookmarkCount} liens vont être ajoutés à votre espace {context}.</p>
               </div>
 
               <button 

@@ -4,6 +4,7 @@ import { supabase } from '../supabase';
 const STORAGE_KEY = 'bookmarks_tracker_data';
 
 const DEFAULT_DATA = {
+  activeContext: 'perso', // 'perso' or 'pro'
   folders: [],
   bookmarks: []
 };
@@ -19,6 +20,12 @@ export function useBookmarks(user) {
       let migrated = false;
       let newFolders = [...loadedData.folders];
       let newBookmarks = [...loadedData.bookmarks];
+
+      // Restore activeContext if missing
+      if (!loadedData.activeContext) {
+        loadedData.activeContext = 'perso';
+        migrated = true;
+      }
 
       // 1. Identify root folders to remove
       const rootIds = ['root-perso', 'root-pro'];
@@ -53,7 +60,6 @@ export function useBookmarks(user) {
 
       if (migrated) {
         const finalData = { ...loadedData, folders: newFolders, bookmarks: newBookmarks };
-        delete finalData.activeContext;
         saveChanges(finalData);
         return finalData;
       }
@@ -126,11 +132,17 @@ export function useBookmarks(user) {
   }, [user]);
 
 
+  const setContext = (context) => {
+    saveChanges({ ...data, activeContext: context });
+  };
+
   const addFolder = (name, parentId = null) => {
+    const parentFolder = data.folders.find(f => f.id === parentId);
     const newFolder = {
       id: 'folder-' + Date.now().toString(),
       name,
       parentId,
+      type: parentFolder ? parentFolder.type : data.activeContext,
       isExpanded: true
     };
     saveChanges({
@@ -158,6 +170,7 @@ export function useBookmarks(user) {
     const newBookmark = {
       id: 'bookmark-' + Date.now().toString(),
       ...bookmark,
+      type: data.activeContext,
       tags: typeof bookmark.tags === 'string' ? bookmark.tags.split(',').map(t => t.trim()).filter(Boolean) : bookmark.tags,
       description: bookmark.description || '',
       faviconUrl: bookmark.faviconUrl || '',
@@ -192,16 +205,19 @@ export function useBookmarks(user) {
   };
 
   const filteredBookmarks = data.bookmarks.filter(b => {
+    const contextMatch = b.type === data.activeContext;
     const query = searchQuery.toLowerCase();
     const searchMatch = !query || b.title.toLowerCase().includes(query) || 
                        b.url.toLowerCase().includes(query) ||
                        b.tags.some(t => t.toLowerCase().includes(query));
-    return searchMatch;
+    return contextMatch && searchMatch;
   });
 
   return {
     data,
-    folders: data.folders,
+    activeContext: data.activeContext,
+    setContext,
+    folders: data.folders.filter(f => f.type === data.activeContext),
     bookmarks: filteredBookmarks,
     allBookmarks: data.bookmarks,
     addFolder,

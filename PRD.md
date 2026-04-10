@@ -4,10 +4,10 @@
 Créer une application de gestion intelligente de bookmarks pour un usage personnel et professionnel, afin d’organiser, rechercher, taguer, et accéder à ses liens internet facilement, depuis n’importe où.
 
 ## 2) Ce que je dois voir (resultat concret a l'ecran)
-- Un écran d’accueil avec une arborescence unique unifiée.
-- L'arborescence affiche des dossiers et sous-dossiers cliquables.
+- Un écran d’accueil avec un bouton alternatif "Perso" / "Boulot" pour séparer les espaces.
+- Dans chaque espace, une arborescence de dossiers et sous-dossiers cliquables.
 - À l’intérieur d’un dossier, liste visuelle des bookmarks (titre, favicon du site, URL cliquable).
-- Barre de recherche en haut (recherche dans tous les liens, tags inclus).
+- Barre de recherche en haut (recherche dans tous les liens de l'espace actif).
 - Champs de saisie pour ajouter un bookmark (titre, URL, dossier, tags).
 - Option de déplacement rapide d’un lien vers un autre dossier (drag & drop ou menu contextuel).
 - Bouton d’export et d’import des bookmarks.
@@ -26,7 +26,7 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 - Recherche en texte libre sur liens et tags
 - Déplacement de liens entre dossiers
 - Export/import de l’ensemble des bookmarks (fichier texte ou JSON)
-- Interface unifiée (plus de séparation Perso/Pro forcée)
+- Séparation espace Perso et Boulot via toggle (mais sans dossiers racines "clutter")
 - Protection par mot de passe maître (Login/Initialisation)
 
 
@@ -71,8 +71,8 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 - Backend Cloud : Intégration Supabase pour la synchronisation en temps réel.
 
 ## 8) Plan de mission (etapes en langage humain)
-1. **Bibliothèque Unifiée** : L’utilisateur accède à toute son arborescence dès la page d’accueil.
-2. **Création & gestion des dossiers** : Peut créer, renommer ou supprimer des dossiers et sous-dossiers.
+1. **Toggle Perso/Boulot** : L’utilisateur bascule entre ses deux espaces de travail via un bouton dédié.
+2. **Arborescence Propre** : Les dossiers racines redondants "Favoris Perso/Pro" sont supprimés ; le contenu remonte directement au premier niveau.
 3. **Ajout et affichage de bookmarks** : Peut ajouter un bookmark (champ + bouton) et il apparaît dans le dossier choisi.
 4. **Tag & recherche** : Peut assigner un tag lors de l’ajout, puis retrouve le lien via un champ de recherche.
 5. **Déplacement** : Peut déplacer un lien d’un dossier à un autre sans recharger la page.
@@ -85,9 +85,9 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 - Fichier d’export lisible avec ses tags, dossiers, URLs.
 
 ## 10) Checklist de validation (pass/fail)
-- [ ] Je vois toute ma bibliothèque à l'accueil sans switch obligatoire.
-- [ ] Je peux créer un dossier et il s’ajoute instantanément.
-- [ ] Je peux ajouter un lien avec Titre + URL + Tag + Dossier.
+- [ ] Je peux basculer instantanément entre l'espace Perso et Boulot.
+- [ ] L'arborescence est "propre" (pas de dossier racine redondant au sommet).
+- [ ] Je peux créer un dossier et il s’ajoute instantanément dans l'espace actif.
 - [ ] Cliquer on un bookmark ouvre bien le site correspondant.
 - [ ] Rechercher un mot-clef affiche bien tous les liens/tag correspondants.
 - [ ] Je peux déplacer un lien d’un dossier à un autre.

@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 
 const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
-  const { folders, addFolder } = bookmarks;
+  const { folders, activeContext, setContext, addFolder } = bookmarks;
 
   const handleToggle = (id) => {
     bookmarks.toggleFolderExpand(id);
@@ -96,6 +96,34 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
             <h1 className="text-xl font-black tracking-tight leading-none text-slate-900">Bibliothèque</h1>
             <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest mt-1.5 block">Digital Saurien</span>
           </div>
+        </div>
+        <div className="bg-slate-50 p-1.5 rounded-[1.5rem] flex items-center gap-1.5 border border-slate-100/50">
+          <button 
+            onClick={() => {
+              setContext('perso');
+              onSelectFolder(null);
+            }}
+            className={`flex-1 flex items-center justify-center gap-2.5 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
+              activeContext === 'perso' 
+                ? 'bg-white text-blue-600 shadow-sm border border-slate-100' 
+                : 'text-slate-400 hover:text-slate-600'
+            }`}
+          >
+            <User size={14} /> Perso
+          </button>
+          <button 
+            onClick={() => {
+              setContext('pro');
+              onSelectFolder(null);
+            }}
+            className={`flex-1 flex items-center justify-center gap-2.5 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
+              activeContext === 'pro' 
+                ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/10' 
+                : 'text-slate-400 hover:text-slate-600'
+            }`}
+          >
+            <Briefcase size={14} /> Boulot
+          </button>
         </div>
       </div>
 

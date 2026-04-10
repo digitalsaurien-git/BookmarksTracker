@@ -118,7 +118,7 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
   };
 
   return (
-    <div className="flex-1 flex flex-col p-10 custom-scrollbar bg-white">
+    <div className="flex-1 flex flex-col p-10 overflow-y-auto custom-scrollbar bg-white">
       {/* Brand & Context Switch */}
       <div className="mb-14">
         <div className="flex items-center gap-5 mb-12">
@@ -133,25 +133,10 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
         <div className="bg-slate-50 p-1.5 rounded-[1.5rem] flex items-center gap-1.5 border border-slate-100/50">
           <button 
             onClick={() => {
-              setContext('all');
-              onSelectFolder(null);
-            }}
-            className={`w-12 h-12 flex items-center justify-center rounded-xl transition-all ${
-              activeContext === 'all' 
-                ? 'bg-white text-slate-900 shadow-sm border border-slate-100' 
-                : 'text-slate-400 hover:text-slate-600'
-            }`}
-            title="Vue globale"
-          >
-            <Library size={18} strokeWidth={2.5} />
-          </button>
-          
-          <button 
-            onClick={() => {
               setContext('perso');
               onSelectFolder(null);
             }}
-            className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
+            className={`flex-1 flex items-center justify-center gap-2.5 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
               activeContext === 'perso' 
                 ? 'bg-white text-blue-600 shadow-sm border border-slate-100' 
                 : 'text-slate-400 hover:text-slate-600'
@@ -164,7 +149,7 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
               setContext('pro');
               onSelectFolder(null);
             }}
-            className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
+            className={`flex-1 flex items-center justify-center gap-2.5 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
               activeContext === 'pro' 
                 ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/10' 
                 : 'text-slate-400 hover:text-slate-600'

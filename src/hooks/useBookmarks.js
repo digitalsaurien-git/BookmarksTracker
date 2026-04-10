@@ -213,7 +213,7 @@ export function useBookmarks(user) {
   };
 
   const filteredBookmarks = data.bookmarks.filter(b => {
-    const contextMatch = data.activeContext === 'all' || b.type === data.activeContext;
+    const contextMatch = b.type === data.activeContext;
     const query = searchQuery.toLowerCase();
     const searchMatch = !query || b.title.toLowerCase().includes(query) || 
                        b.url.toLowerCase().includes(query) ||
@@ -225,7 +225,7 @@ export function useBookmarks(user) {
     data,
     activeContext: data.activeContext,
     setContext,
-    folders: data.activeContext === 'all' ? data.folders : data.folders.filter(f => f.type === data.activeContext),
+    folders: data.folders.filter(f => f.type === data.activeContext),
     bookmarks: filteredBookmarks,
     allBookmarks: data.bookmarks,
     addFolder,

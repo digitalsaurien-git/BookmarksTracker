@@ -3,6 +3,7 @@ import BookmarkCard from './BookmarkCard';
 import { ChevronRight, LayoutGrid, Layers, Ghost, Sparkles } from 'lucide-react';
 
 const MainContent = ({ bookmarks, folderId, onAdd }) => {
+  const [sortOrder, setSortOrder] = React.useState('alpha'); // 'alpha' or 'hits'
   const currentFolder = bookmarks.folders.find(f => f.id === folderId);
   
   const folderPath = [];
@@ -20,6 +21,14 @@ const MainContent = ({ bookmarks, folderId, onAdd }) => {
 
   const relevantFolderIds = getDescendantFolderIds(folderId);
   const folderBookmarks = bookmarks.bookmarks.filter(b => relevantFolderIds.includes(b.folderId));
+
+  const sortedBookmarks = [...folderBookmarks].sort((a, b) => {
+    if (sortOrder === 'alpha') {
+      return (a.title || '').localeCompare(b.title || '');
+    } else {
+      return (b.clicks || 0) - (a.clicks || 0);
+    }
+  });
 
   if (folderBookmarks.length === 0 && !bookmarks.searchQuery) {
     return (
@@ -66,21 +75,32 @@ const MainContent = ({ bookmarks, folderId, onAdd }) => {
           </div>
         </div>
         
-        <div className="flex bg-slate-100 p-1 rounded-xl">
-           <div className="p-2 bg-white rounded-lg shadow-sm text-slate-900">
-              <LayoutGrid size={18} />
-           </div>
+        <div className="flex bg-slate-100 p-1 rounded-xl gap-1">
+          <button 
+            onClick={() => setSortOrder('alpha')}
+            className={`p-2 rounded-lg transition-all ${sortOrder === 'alpha' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}
+            title="Trier par nom (A-Z)"
+          >
+            <LayoutGrid size={18} />
+          </button>
+          <button 
+            onClick={() => setSortOrder('hits')}
+            className={`p-2 rounded-lg transition-all ${sortOrder === 'hits' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
+            title="Trier par popularité"
+          >
+            <Sparkles size={18} />
+          </button>
         </div>
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-        {folderBookmarks.map(bookmark => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {sortedBookmarks.map(bookmark => (
           <BookmarkCard 
             key={bookmark.id} 
             bookmark={bookmark}
             onDelete={bookmarks.deleteBookmark}
-            onMove={bookmarks.moveBookmark}
+            onIncrement={bookmarks.incrementClickCount}
           />
         ))}
       </div>

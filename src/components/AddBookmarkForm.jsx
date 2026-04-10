@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Globe, Link2, Tag, Folder, AlignLeft, Shield, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -44,12 +45,12 @@ const AddBookmarkForm = ({ onClose, onSubmit, folders, defaultFolderId }) => {
     onSubmit({ ...formData, url });
   };
 
-  return (
-    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4 overflow-y-auto">
+  return createPortal(
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4 overflow-y-auto">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="bg-white w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl"
+        className="bg-white w-full max-w-2xl rounded-3xl overflow-hidden shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)]"
       >
         <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div className="flex items-center gap-3">
@@ -181,7 +182,8 @@ const AddBookmarkForm = ({ onClose, onSubmit, folders, defaultFolderId }) => {
           </button>
         </form>
       </motion.div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

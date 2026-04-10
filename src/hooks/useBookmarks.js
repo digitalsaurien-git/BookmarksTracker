@@ -251,10 +251,11 @@ export function useBookmarks(user) {
 
   const filteredBookmarks = data.bookmarks.filter(b => {
     const contextMatch = b.type === data.activeContext;
-    const query = searchQuery.toLowerCase();
-    const searchMatch = !query || b.title.toLowerCase().includes(query) || 
-                       b.url.toLowerCase().includes(query) ||
-                       b.tags.some(t => t.toLowerCase().includes(query));
+    const query = (searchQuery || '').toLowerCase();
+    const searchMatch = !query || 
+                       (b.title || '').toLowerCase().includes(query) || 
+                       (b.url || '').toLowerCase().includes(query) ||
+                       (Array.isArray(b.tags) ? b.tags : []).some(t => (t || '').toLowerCase().includes(query));
     return contextMatch && searchMatch;
   });
 

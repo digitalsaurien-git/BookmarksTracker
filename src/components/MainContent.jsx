@@ -20,7 +20,10 @@ const MainContent = ({ bookmarks, folderId, onAdd }) => {
   };
 
   const relevantFolderIds = getDescendantFolderIds(folderId);
-  const folderBookmarks = bookmarks.bookmarks.filter(b => relevantFolderIds.includes(b.folderId));
+  const isSearching = !!bookmarks.searchQuery;
+  const folderBookmarks = isSearching 
+    ? bookmarks.bookmarks 
+    : bookmarks.bookmarks.filter(b => relevantFolderIds.includes(b.folderId));
 
   const sortedBookmarks = [...folderBookmarks].sort((a, b) => {
     if (sortOrder === 'alpha') {

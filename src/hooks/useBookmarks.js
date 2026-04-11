@@ -12,6 +12,7 @@ const DEFAULT_DATA = {
 export function useBookmarks(user) {
   const [data, setData] = useState(DEFAULT_DATA);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState('all'); // 'all', 'favorites', 'daily', 'popular'
   const [isSyncing, setIsSyncing] = useState(false);
 
   // Load data & Migration
@@ -192,12 +193,16 @@ export function useBookmarks(user) {
   const addBookmark = (bookmark) => {
     const newBookmark = {
       id: 'bookmark-' + Date.now().toString(),
-      ...bookmark,
-      type: data.activeContext,
-      tags: typeof bookmark.tags === 'string' ? bookmark.tags.split(',').map(t => t.trim()).filter(Boolean) : bookmark.tags,
+      title: bookmark.title || '',
+      url: bookmark.url || '',
       description: bookmark.description || '',
+      folderId: bookmark.folderId || null,
+      type: data.activeContext,
+      tags: Array.isArray(bookmark.tags) ? bookmark.tags : 
+            (typeof bookmark.tags === 'string' ? bookmark.tags.split(',').map(t => t.trim()).filter(Boolean) : []),
+      isFavorite: !!bookmark.isFavorite,
+      clicks: 0,
       faviconUrl: bookmark.faviconUrl || '',
-      isPrivate: !!bookmark.isPrivate,
       createdAt: new Date().toISOString()
     };
     saveChanges({
@@ -252,12 +257,35 @@ export function useBookmarks(user) {
   const filteredBookmarks = data.bookmarks.filter(b => {
     const contextMatch = b.type === data.activeContext;
     const query = (searchQuery || '').toLowerCase();
+    
+    // Combined filtering logic
+    let filterMatch = true;
+    if (activeFilter === 'favorites') filterMatch = b.isFavorite;
+    else if (activeFilter === 'daily') filterMatch = (b.tags || []).includes('usage:quotidien');
+    else if (activeFilter === 'popular') {
+      // Return top 10 in popular view
+      const top10Ids = [...data.bookmarks]
+        .filter(x => x.type === data.activeContext && x.clicks > 0)
+        .sort((a, b) => (b.clicks || 0) - (a.clicks || 0))
+        .slice(0, 10)
+        .map(x => x.id);
+      filterMatch = top10Ids.includes(b.id);
+    }
+    
     const searchMatch = !query || 
                        (b.title || '').toLowerCase().includes(query) || 
                        (b.url || '').toLowerCase().includes(query) ||
+                       (b.description || '').toLowerCase().includes(query) ||
                        (Array.isArray(b.tags) ? b.tags : []).some(t => (t || '').toLowerCase().includes(query));
-    return contextMatch && searchMatch;
+    
+    return contextMatch && filterMatch && searchMatch;
   });
+
+  // Special view for popularity (Top 10)
+  const popularBookmarks = [...data.bookmarks]
+    .filter(b => b.type === data.activeContext && b.clicks > 0)
+    .sort((a, b) => (b.clicks || 0) - (a.clicks || 0))
+    .slice(0, 10);
 
   return {
     data,
@@ -277,6 +305,9 @@ export function useBookmarks(user) {
     updateBookmark,
     incrementClickCount,
     getBookmarkCount,
+    activeFilter,
+    setActiveFilter,
+    popularBookmarks,
     searchQuery,
     setSearchQuery,
     isSyncing,

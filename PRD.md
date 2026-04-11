@@ -45,11 +45,29 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 - Fréquence : après chaque découverte de lien utile, gestion et recherche quasi-quotidienne.
 - Objectif : ne jamais perdre un lien et retrouver rapidement n’importe quelle ressource numérique.
 
-## 5) Donnees / contenu
-- Bookmarks : titre, URL (format texte, obligatoire), dossier/sous-dossier (arborescence), tags (simples, séparés par virgules).
-- Dossiers : noms personnalisables, hiérarchie libre.
-- Fichiers d’export/import : format recommandés JSON et CSV.
-- Toutes les données sont stockées localement (dans le navigateur, type `localStorage` ou fichier export) et synchronisées via Supabase.
+## 5) Données / contenu (Nouveau Data Model)
+- **Bookmarks** :
+    - `id` : Identifiant unique (UUID/Timestamp).
+    - `title` : Titre explicite du lien.
+    - `url` : URL complète (cliquable).
+    - `description` : Notes de contexte (Pourquoi ce lien ? Que contient-il ?).
+    - `folderId` : Parenté (Arborescence limitée à 2 niveaux).
+    - `tags` : Liste structurée au format `clé:valeur` (ex: `tool:make`).
+    - `isFavorite` : Booléen pour l'accès rapide.
+    - `clicks` : Compteur pour la popularité.
+    - `createdAt` : Date de création.
+    - `type` : Contexte (`perso` ou `pro`).
+- **Dossiers** :
+    - `id`, `name`, `parentId`, `type` (perso/pro), `color`.
+- **Système de Tags Structurés** :
+    - `tool:nom` (ex: `tool:figma`)
+    - `type:format` (ex: `type:article`)
+    - `projet:nom` (ex: `projet:site-web`)
+    - `status:etat` (ex: `status:a-lire`)
+    - `prio:niveau` (ex: `prio:1`)
+    - `usage:frequence` (ex: `usage:quotidien`)
+
+- **Stockage** : Toutes les données sont stockées localement (`localStorage`) et synchronisées via Supabase dans un payload unique pour la rapidité.
 
 ## 6) Regles de qualite (non-negociables)
 **DO :**
@@ -104,7 +122,11 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 - **Importation Universelle** : Parseur Netscape supportant Chrome, Firefox, Safari.
 - **Synchronisation Cloud (Supabase)** : Persistance sécurisée multi-appareils.
 - **Expérience Bureau Class A** : Sidebar large (420px), barre de recherche centrale.
-- Tri intelligent : par ordre alphabétique ou par nombre de clics (popularité).
-- Tracking de clics : chaque ouverture de lien est comptabilisée pour identifier les ressources utiles.
+- **Filtrage Intelligent (Vues)** :
+    - ⭐ **Favoris** : Liens marqués `isFavorite`.
+    - ⏱️ **Daily** : Filtre sur `usage:quotidien`.
+    - 📁 **Projets Actifs** : Regroupe les tags `projet:*` avec un `status:en-cours`.
+    - 🔭 **À Explorer** : Liens jamais cliqués ou tagués `status:a-explorer`.
+    - 🛠️ **Par Outil** : Navigation dynamique via les tags `tool:*`.
 
 

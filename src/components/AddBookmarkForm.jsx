@@ -46,11 +46,12 @@ const AddBookmarkForm = ({ onClose, onSubmit, folders, defaultFolderId }) => {
   };
 
   return createPortal(
+  return createPortal(
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4 overflow-y-auto">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="bg-white w-full max-w-2xl rounded-3xl overflow-hidden shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)]"
+        className="bg-white w-full max-w-2xl rounded-3xl overflow-hidden shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] my-auto"
       >
         <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div className="flex items-center gap-3">
@@ -111,8 +112,8 @@ const AddBookmarkForm = ({ onClose, onSubmit, folders, defaultFolderId }) => {
               <AlignLeft size={12} className="text-slate-400" /> Description
             </label>
             <textarea
-              placeholder="Petite note sur ce lien..."
-              rows={3}
+              placeholder="Petite note sur ce lien... pourquoi l'avoir enregistré ?"
+              rows={2}
               className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl p-3 focus:border-blue-500 focus:bg-white outline-none transition-all resize-none placeholder-slate-400 font-medium"
               value={formData.description}
               onChange={e => setFormData({...formData, description: e.target.value})}
@@ -144,45 +145,70 @@ const AddBookmarkForm = ({ onClose, onSubmit, folders, defaultFolderId }) => {
               </label>
               <input
                 type="text"
-                placeholder="dev, docs, react (séparés par virgules)"
+                placeholder="tool:make, prio:1, type:doc"
                 className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl p-3 focus:border-purple-500 focus:bg-white outline-none transition-all placeholder-slate-400 font-medium"
                 value={formData.tags}
                 onChange={e => setFormData({...formData, tags: e.target.value})}
               />
+              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">Format conseillé: clé:valeur (ex: tool:make)</p>
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-yellow-100 rounded-lg text-yellow-600">
-                <Shield size={18} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 transition-all hover:bg-white">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg transition-colors ${formData.isFavorite ? 'bg-amber-100 text-amber-600' : 'bg-slate-200 text-slate-400'}`}>
+                  <Sparkles size={18} fill={formData.isFavorite ? "currentColor" : "none"} />
+                </div>
+                <div>
+                  <p className="text-xs font-black text-slate-900">Coup de ❤️</p>
+                  <p className="text-[9px] text-slate-500 font-bold uppercase tracking-tighter">Accès rapide favoris</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-bold text-slate-900">Rendre ce lien privé</p>
-                <p className="text-[10px] text-slate-500 font-medium">Masqué lors du partage ou export public</p>
-              </div>
+              <button
+                type="button"
+                onClick={() => setFormData({...formData, isFavorite: !formData.isFavorite})}
+                className={`w-10 h-5 rounded-full transition-all relative ${formData.isFavorite ? 'bg-amber-500' : 'bg-slate-300'}`}
+              >
+                <motion.div 
+                  animate={{ x: formData.isFavorite ? 22 : 2 }}
+                  className="absolute top-0.5 w-4 h-4 bg-white rounded-full shadow"
+                />
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => setFormData({...formData, isPrivate: !formData.isPrivate})}
-              className={`w-12 h-6 rounded-full transition-all relative ${formData.isPrivate ? 'bg-yellow-500' : 'bg-slate-300'}`}
-            >
-              <motion.div 
-                animate={{ x: formData.isPrivate ? 26 : 4 }}
-                className="absolute top-1 w-4 h-4 bg-white rounded-full shadow border-slate-100"
-              />
-            </button>
+
+            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 transition-all hover:bg-white">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg transition-colors ${formData.isPrivate ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-200 text-slate-400'}`}>
+                  <Shield size={18} />
+                </div>
+                <div>
+                  <p className="text-xs font-black text-slate-900">Privé</p>
+                  <p className="text-[9px] text-slate-500 font-bold uppercase tracking-tighter">Masqué si partagé</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFormData({...formData, isPrivate: !formData.isPrivate})}
+                className={`w-10 h-5 rounded-full transition-all relative ${formData.isPrivate ? 'bg-indigo-500' : 'bg-slate-300'}`}
+              >
+                <motion.div 
+                  animate={{ x: formData.isPrivate ? 22 : 2 }}
+                  className="absolute top-0.5 w-4 h-4 bg-white rounded-full shadow"
+                />
+              </button>
+            </div>
           </div>
 
           <button 
             type="submit"
-            className="w-full py-4 bg-blue-600 text-white rounded-xl font-black text-[13px] uppercase tracking-widest hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/30 transition-all active:scale-[0.98] mt-4"
+            className="w-full py-4 bg-slate-900 text-white rounded-xl font-black text-[13px] uppercase tracking-widest hover:bg-blue-600 hover:shadow-xl hover:shadow-blue-600/30 transition-all active:scale-[0.98] mt-4"
           >
             Enregistrer le favori
           </button>
         </form>
       </motion.div>
-    </div>,
+    </div>
     document.body
   );
 };

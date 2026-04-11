@@ -188,11 +188,83 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
         </div>
       </div>
 
+      {/* Smart Views */}
+      <div className="mb-14">
+        <div className="flex items-center gap-3 mb-8 px-2">
+          <Sparkles size={14} className="text-blue-500" />
+          <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Vues Intelligentes</h3>
+        </div>
+        
+        <div className="space-y-2">
+          <div 
+            onClick={() => {
+              bookmarks.setActiveFilter('all');
+              onSelectFolder(null);
+            }}
+            className={`flex items-center gap-4 px-5 py-4 rounded-2xl cursor-pointer transition-all ${
+              bookmarks.activeFilter === 'all' && selectedFolderId === null
+                ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/10' 
+                : 'hover:bg-slate-50 text-slate-600'
+            }`}
+          >
+            <Hash size={18} className={bookmarks.activeFilter === 'all' && selectedFolderId === null ? 'text-blue-400' : 'opacity-30'} />
+            <span className={`text-[13px] font-black leading-none ${bookmarks.activeFilter === 'all' && selectedFolderId === null ? 'text-white' : 'text-slate-700'}`}>Tous les favoris</span>
+          </div>
+
+          <div 
+            onClick={() => {
+              bookmarks.setActiveFilter('favorites');
+              onSelectFolder(null);
+            }}
+            className={`flex items-center justify-between px-5 py-4 rounded-2xl cursor-pointer transition-all ${
+              bookmarks.activeFilter === 'favorites' 
+                ? 'bg-amber-500 text-white shadow-xl shadow-amber-500/20' 
+                : 'hover:bg-slate-50 text-slate-600'
+            }`}
+          >
+            <div className="flex items-center gap-4">
+              <Sparkles size={18} fill={bookmarks.activeFilter === 'favorites' ? "currentColor" : "none"} className={bookmarks.activeFilter === 'favorites' ? 'text-white' : 'text-amber-500'} />
+              <span className={`text-[13px] font-black leading-none`}>Coup de ❤️</span>
+            </div>
+          </div>
+
+          <div 
+            onClick={() => {
+              bookmarks.setActiveFilter('daily');
+              onSelectFolder(null);
+            }}
+            className={`flex items-center gap-4 px-5 py-4 rounded-2xl cursor-pointer transition-all ${
+              bookmarks.activeFilter === 'daily' 
+                ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20' 
+                : 'hover:bg-slate-50 text-slate-600'
+            }`}
+          >
+            <Compass size={18} className={bookmarks.activeFilter === 'daily' ? 'text-white' : 'text-blue-500'} />
+            <span className={`text-[13px] font-black leading-none`}>Usage Quotidien</span>
+          </div>
+
+          <div 
+            onClick={() => {
+              bookmarks.setActiveFilter('popular');
+              onSelectFolder(null);
+            }}
+            className={`flex items-center gap-4 px-5 py-4 rounded-2xl cursor-pointer transition-all ${
+              bookmarks.activeFilter === 'popular' 
+                ? 'bg-rose-500 text-white shadow-xl shadow-rose-500/20' 
+                : 'hover:bg-slate-50 text-slate-600'
+            }`}
+          >
+            <Compass size={18} className={bookmarks.activeFilter === 'popular' ? 'text-white' : 'text-rose-500'} />
+            <span className={`text-[13px] font-black leading-none`}>Top 10 (Populaire)</span>
+          </div>
+        </div>
+      </div>
+
       {/* Folders List */}
       <div className="flex-1">
         <div className="flex items-center justify-between mb-8 px-2">
           <div className="flex items-center gap-3">
-            <Compass size={14} className="text-slate-300" />
+            <Library size={14} className="text-slate-300" />
             <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Explorateur</h3>
           </div>
           <button 
@@ -204,25 +276,58 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId }) => {
         </div>
         
         <div className="space-y-2">
-          <div 
-            onDragOver={onDragOver}
-            onDrop={(e) => onDrop(e, null)}
-            onClick={() => onSelectFolder(null)}
-            className={`flex items-center gap-4 px-5 py-4 rounded-2xl cursor-pointer transition-all ${
-              selectedFolderId === null 
-                ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/10' 
-                : 'hover:bg-slate-50 text-slate-600'
-            }`}
-          >
-            <Hash size={18} className={selectedFolderId === null ? 'text-blue-400' : 'opacity-30'} />
-            <span className={`text-[13px] font-black leading-none ${selectedFolderId === null ? 'text-white' : 'text-slate-700'}`}>Tous les favoris</span>
-          </div>
-
-          <div className="mt-10 pt-6 border-t border-slate-50 space-y-2">
+          <div className="mt-2 space-y-2">
             {folders.filter(f => f.parentId === null).map(folder => (
               <FolderItem key={folder.id} folder={folder} />
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Toolbox Section */}
+      <div className="mb-14">
+        <div className="flex items-center gap-3 mb-8 px-2">
+          <Settings size={14} className="text-purple-500" />
+          <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Boîte à outils</h3>
+        </div>
+        
+        <div className="flex flex-wrap gap-2 px-2">
+          {[...new Set(
+            bookmarks.allBookmarks
+              .filter(b => b.type === bookmarks.activeContext)
+              .flatMap(b => Array.isArray(b.tags) ? b.tags : [])
+              .filter(t => t.startsWith('tool:'))
+          )].map(toolTag => {
+            const toolName = toolTag.split(':')[1];
+            const isActive = bookmarks.searchQuery === toolTag;
+            
+            return (
+              <button
+                key={toolTag}
+                onClick={() => {
+                  bookmarks.setSearchQuery(isActive ? '' : toolTag);
+                  bookmarks.setActiveFilter('all');
+                  onSelectFolder(null);
+                }}
+                className={`px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all border ${
+                  isActive 
+                    ? 'bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-200' 
+                    : 'bg-slate-50 text-slate-500 border-slate-100 hover:bg-slate-100 hover:text-slate-900'
+                }`}
+              >
+                {toolName}
+              </button>
+            );
+          })}
+          
+          {[...new Set(
+            bookmarks.allBookmarks
+              .filter(b => b.type === bookmarks.activeContext)
+              .flatMap(b => Array.isArray(b.tags) ? b.tags : [])
+              .filter(t => t.startsWith('tool:'))
+          )].length === 0 && (
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest px-1 italic">Aucun outil tagué</p>
+          )}
         </div>
       </div>
 

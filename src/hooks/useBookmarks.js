@@ -9,6 +9,24 @@ const DEFAULT_DATA = {
   bookmarks: []
 };
 
+const normalizeUrl = (url) => {
+  if (!url) return '';
+  try {
+    let u = url.trim().toLowerCase();
+    // Remove protocol
+    u = u.replace(/^https?:\/\//, '');
+    // Remove www.
+    u = u.replace(/^www\./, '');
+    // Remove trailing slash
+    u = u.replace(/\/$/, '');
+    // Remove hash/fragments if they don't look important (simple version)
+    u = u.split('#')[0];
+    return u;
+  } catch (e) {
+    return url.trim().toLowerCase();
+  }
+};
+
 export function useBookmarks(user) {
   const [data, setData] = useState(DEFAULT_DATA);
   const [searchQuery, setSearchQuery] = useState('');
@@ -59,11 +77,29 @@ export function useBookmarks(user) {
         }
       }
 
-      // 2. Assign colors to folders if missing
+      // 3. New Migration: Flatten any folders > 2 levels deep
+      const findDepth = (fid, currentFolders) => {
+        let depth = 0;
+        let current = currentFolders.find(f => f.id === fid);
+        while (current && current.parentId) {
+          depth++;
+          current = currentFolders.find(f => f.id === current.parentId);
+        }
+        return depth;
+      };
+
+      let deepFoldersFound = false;
       newFolders = newFolders.map(f => {
-        if (!f.color) {
+        const depth = findDepth(f.id, newFolders);
+        if (depth > 1) { // 0: Root, 1: Subfolder, >1: Too deep
+          deepFoldersFound = true;
           migrated = true;
-          return { ...f, color: FOLDER_COLORS[Math.floor(Math.random() * FOLDER_COLORS.length)] };
+          // Find root ancestor for this folder to move it to level 1
+          let ancestor = newFolders.find(x => x.id === f.parentId);
+          while (ancestor && ancestor.parentId) {
+            ancestor = newFolders.find(x => x.id === ancestor.parentId);
+          }
+          return { ...f, parentId: ancestor ? ancestor.id : null };
         }
         return f;
       });
@@ -153,7 +189,13 @@ export function useBookmarks(user) {
   ];
 
   const addFolder = (name, parentId = null) => {
+    // Check level: Parent must not have a parent (limit traversal to 1 level deep)
     const parentFolder = data.folders.find(f => f.id === parentId);
+    if (parentFolder && parentFolder.parentId !== null) {
+      // Trying to add a 3rd level folder? Reject or add at the same level
+      parentId = parentFolder.parentId;
+    }
+
     const newFolder = {
       id: 'folder-' + Date.now().toString(),
       name,
@@ -247,11 +289,18 @@ export function useBookmarks(user) {
     });
   };
 
-  const getBookmarkCount = (folderId) => {
-    const childFolders = data.folders.filter(f => f.parentId === folderId);
-    const subCount = childFolders.reduce((sum, f) => sum + getBookmarkCount(f.id), 0);
+  const getFolderCounts = useCallback((folderId) => {
     const directCount = data.bookmarks.filter(b => b.folderId === folderId).length;
-    return directCount + subCount;
+    const childFolders = data.folders.filter(f => f.parentId === folderId);
+    const subCount = childFolders.reduce((sum, f) => sum + getFolderCounts(f.id).total, 0);
+    return {
+      direct: directCount,
+      total: directCount + subCount
+    };
+  }, [data.bookmarks, data.folders]);
+
+  const getContextCount = (context) => {
+    return data.bookmarks.filter(b => b.type === context).length;
   };
 
   const filteredBookmarks = data.bookmarks.filter(b => {
@@ -304,22 +353,134 @@ export function useBookmarks(user) {
     moveBookmark,
     updateBookmark,
     incrementClickCount,
-    getBookmarkCount,
+    getFolderCounts,
+    getContextCount,
     activeFilter,
     setActiveFilter,
     popularBookmarks,
+    projects: [...new Set(
+      data.bookmarks
+        .filter(b => b.type === data.activeContext)
+        .flatMap(b => Array.isArray(b.tags) ? b.tags : [])
+        .filter(t => t.startsWith('projet:'))
+    )],
     searchQuery,
     setSearchQuery,
     isSyncing,
     importData: (newData) => saveChanges(newData),
     exportData: () => JSON.stringify(data, null, 2),
-    bulkImport: async (importedFolders, importedBookmarks) => {
-      const newData = {
-        ...data,
-        folders: [...data.folders, ...importedFolders],
-        bookmarks: [...data.bookmarks, ...importedBookmarks]
+    analyzeImport: (importedBookmarks) => {
+      const results = {
+        recognized: 0,
+        toCreate: 0,
+        toUpdate: 0,
+        ambiguous: [], // Cases needing review
+        simpleUpdates: []
       };
-      await saveChanges(newData);
+
+      importedBookmarks.forEach(ib => {
+        const normIb = normalizeUrl(ib.url);
+        const existing = data.bookmarks.find(b => normalizeUrl(b.url) === normIb);
+        
+        if (existing) {
+          results.recognized++;
+          
+          // Ambiguity detection
+          const titleDiff = (ib.title && existing.title && ib.title.toLowerCase().trim() !== existing.title.toLowerCase().trim());
+          const descConflict = (ib.description && existing.description && ib.description.trim() !== existing.description.trim() && existing.description.length > 10);
+          
+          // Count dimension changes
+          const existingDims = (existing.tags || []).filter(t => t.includes(':')).map(t => t.split(':')[0]);
+          const incomingDims = (ib.tags || []).filter(t => t.includes(':')).map(t => t.split(':')[0]);
+          const changedDims = incomingDims.filter(d => {
+            const oldVal = (existing.tags || []).find(t => t.startsWith(`${d}:`));
+            const newVal = (ib.tags || []).find(t => t.startsWith(`${d}:`));
+            return oldVal !== newVal;
+          });
+
+          if (titleDiff || descConflict || changedDims.length >= 3) {
+            results.ambiguous.push({ existing, incoming: ib, reasons: { titleDiff, descConflict, changedDims } });
+          } else {
+            results.toUpdate++;
+            results.simpleUpdates.push({ existing, incoming: ib });
+          }
+        } else {
+          results.toCreate++;
+        }
+      });
+      return results;
+    },
+    commitSmartImport: (importedBookmarks, manualChoices = []) => {
+      let updatedBookmarks = [...data.bookmarks];
+      const newBookmarks = [];
+
+      importedBookmarks.forEach(ib => {
+        const normIb = normalizeUrl(ib.url);
+        const index = updatedBookmarks.findIndex(b => normalizeUrl(b.url) === normIb);
+
+        if (index !== -1) {
+          const existing = updatedBookmarks[index];
+          const choice = manualChoices.find(c => normalizeUrl(c.url) === normIb);
+          
+          if (choice && choice.action === 'skip') return;
+
+          // Smart Tag Merge Policy
+          const existingTags = existing.tags || [];
+          const incomingTags = ib.tags || [];
+          
+          // Split into dimensions and free tags
+          const existingDimMap = {};
+          const freeTags = [];
+          existingTags.forEach(t => {
+            if (t.includes(':')) {
+              const [k, v] = t.split(':');
+              existingDimMap[k] = v;
+            } else {
+              freeTags.push(t);
+            }
+          });
+
+          incomingTags.forEach(t => {
+            if (t.includes(':')) {
+              const [k, v] = t.split(':');
+              // OVERWRITE the dimension with incoming value
+              existingDimMap[k] = v;
+            } else {
+              if (!freeTags.includes(t)) freeTags.push(t);
+            }
+          });
+
+          const finalTags = [
+            ...Object.entries(existingDimMap).map(([k, v]) => `${k}:${v}`),
+            ...freeTags
+          ];
+
+          updatedBookmarks[index] = {
+            ...existing,
+            title: ib.title || existing.title,
+            description: ib.description || existing.description,
+            tags: finalTags,
+            isFavorite: ib.isFavorite !== undefined ? ib.isFavorite : existing.isFavorite,
+          };
+        } else {
+          // Create new
+          newBookmarks.push({
+            id: 'bookmark-' + Date.now().toString() + Math.random().toString(36).substr(2, 9),
+            title: ib.title || 'Sans titre',
+            url: ib.url,
+            description: ib.description || '',
+            tags: ib.tags || [],
+            type: data.activeContext,
+            createdAt: new Date().toISOString(),
+            clicks: 0
+          });
+        }
+      });
+
+      saveChanges({
+        ...data,
+        bookmarks: [...updatedBookmarks, ...newBookmarks]
+      });
     }
   };
 }

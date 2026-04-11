@@ -72,9 +72,16 @@ const MainContent = ({ bookmarks, folderId, onAdd }) => {
           <h1 className="text-5xl font-black tracking-tight text-slate-900">
             {currentFolder?.name || 'Tous les favoris'}
           </h1>
-          <div className="flex items-center gap-2 mt-4 text-slate-400 font-bold text-xs uppercase tracking-widest">
-            <Layers size={14} />
-            <span>{folderBookmarks.length} ressources disponibles</span>
+          <div className="flex items-center gap-6 mt-4">
+            <div className="flex items-center gap-2 text-slate-400 font-bold text-xs uppercase tracking-widest">
+              <Layers size={14} />
+              <span>{folderBookmarks.length} ressources {folderId ? 'dans cette arborescence' : ''}</span>
+            </div>
+            {folderId && bookmarks.getFolderCounts(folderId).direct > 0 && (
+              <div className="flex items-center gap-2 text-blue-500/50 font-bold text-[10px] uppercase tracking-widest border-l border-slate-200 pl-6">
+                <span>{bookmarks.getFolderCounts(folderId).direct} liens directs</span>
+              </div>
+            )}
           </div>
         </div>
         

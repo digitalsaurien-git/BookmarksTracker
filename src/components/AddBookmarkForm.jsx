@@ -3,15 +3,37 @@ import { createPortal } from 'react-dom';
 import { X, Globe, Link2, Tag, Folder, AlignLeft, Shield, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+const TAG_CATEGORIES = {
+  tool: {
+    label: 'Outil',
+    options: ['Make', 'Notion', 'OpenAI', 'Airtable', 'Power Automate', 'Zapier', 'Stitch', 'Google Cloud', 'AWS']
+  },
+  usage: {
+    label: 'Usage',
+    options: ['Quotidien', 'Occasionnel', 'Rare']
+  },
+  status: {
+    label: 'Statut',
+    options: ['Actif', 'Test', 'À voir', 'Archive']
+  }
+};
+
 const AddBookmarkForm = ({ onClose, onSubmit, folders, defaultFolderId }) => {
   const [formData, setFormData] = useState({
     title: '',
     url: '',
-    tags: '',
     folderId: defaultFolderId || '',
     description: '',
     faviconUrl: '',
-    isPrivate: false
+    isPrivate: false,
+    isFavorite: false,
+    // Guided tags
+    categoryValues: {
+      tool: '',
+      usage: '',
+      status: ''
+    },
+    otherTags: ''
   });
 
   const [isAutoFetching, setIsAutoFetching] = useState(false);
@@ -42,10 +64,17 @@ const AddBookmarkForm = ({ onClose, onSubmit, folders, defaultFolderId }) => {
       url = 'https://' + url;
     }
     
-    onSubmit({ ...formData, url });
+    // Combine guided tags and other tags
+    const structuredTags = Object.entries(formData.categoryValues)
+      .filter(([_, val]) => val)
+      .map(([cat, val]) => `${cat}:${val.toLowerCase()}`);
+    
+    const manualTags = formData.otherTags.split(',').map(t => t.trim()).filter(Boolean);
+    const finalTags = [...new Set([...structuredTags, ...manualTags])];
+
+    onSubmit({ ...formData, url, tags: finalTags });
   };
 
-  return createPortal(
   return createPortal(
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4 overflow-y-auto">
       <motion.div 
@@ -139,18 +168,40 @@ const AddBookmarkForm = ({ onClose, onSubmit, folders, defaultFolderId }) => {
               </select>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-4">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                <Tag size={12} className="text-purple-500" /> Tags
+                <Tag size={12} className="text-purple-500" /> Catégorisation Intelligente
               </label>
-              <input
-                type="text"
-                placeholder="tool:make, prio:1, type:doc"
-                className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl p-3 focus:border-purple-500 focus:bg-white outline-none transition-all placeholder-slate-400 font-medium"
-                value={formData.tags}
-                onChange={e => setFormData({...formData, tags: e.target.value})}
-              />
-              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">Format conseillé: clé:valeur (ex: tool:make)</p>
+              
+              <div className="grid grid-cols-3 gap-3">
+                {Object.entries(TAG_CATEGORIES).map(([key, cat]) => (
+                  <div key={key} className="space-y-1.5">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter ml-1">{cat.label}</p>
+                    <select
+                      value={formData.categoryValues[key]}
+                      onChange={(e) => setFormData({
+                        ...formData, 
+                        categoryValues: { ...formData.categoryValues, [key]: e.target.value }
+                      })}
+                      className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl p-2.5 text-xs font-bold outline-none focus:border-purple-500 transition-all cursor-pointer"
+                    >
+                      <option value="">Aucun</option>
+                      {cat.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                    </select>
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-1.5 mt-4">
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter ml-1">Autres Tags (libres)</p>
+                <input
+                  type="text"
+                  placeholder="prio:1, perso, r&d..."
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl p-3 focus:border-purple-500 focus:bg-white outline-none transition-all placeholder-slate-400 font-medium text-sm"
+                  value={formData.otherTags}
+                  onChange={e => setFormData({...formData, otherTags: e.target.value})}
+                />
+              </div>
             </div>
           </div>
 
@@ -208,7 +259,7 @@ const AddBookmarkForm = ({ onClose, onSubmit, folders, defaultFolderId }) => {
           </button>
         </form>
       </motion.div>
-    </div>
+    </div>,
     document.body
   );
 };

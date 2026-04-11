@@ -4,6 +4,7 @@ import MainContent from './components/MainContent';
 import SearchBar from './components/SearchBar';
 import AddBookmarkForm from './components/AddBookmarkForm';
 import ImportModal from './components/ImportModal';
+import SmartImportModal from './components/SmartImportModal';
 import LoginView from './components/LoginView';
 import { useBookmarks } from './hooks/useBookmarks';
 import { useAuth } from './hooks/useAuth';
@@ -16,6 +17,7 @@ function App() {
   const [selectedFolderId, setSelectedFolderId] = useState(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
+  const [isSmartOpen, setIsSmartOpen] = useState(false);
 
   if (auth.isLoading) return null;
   if (!auth.isAuthenticated) return <LoginView auth={auth} />;
@@ -32,6 +34,7 @@ function App() {
           bookmarks={bookmarks} 
           onSelectFolder={setSelectedFolderId}
           selectedFolderId={selectedFolderId}
+          onOpenSmartImport={() => setIsSmartOpen(true)}
         />
         
         {/* User Profile / Logout */}
@@ -121,6 +124,11 @@ function App() {
               onImport={bookmarks.bulkImport}
             />
           )}
+          <SmartImportModal 
+            isOpen={isSmartOpen} 
+            onClose={() => setIsSmartOpen(false)} 
+            bookmarks={bookmarks}
+          />
         </AnimatePresence>
       </main>
     </div>

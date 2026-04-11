@@ -3,16 +3,48 @@ import { createPortal } from 'react-dom';
 import { X, Globe, Link2, Tag, Folder, AlignLeft, Shield, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+const TAG_CATEGORIES = {
+  tool: { label: 'Outil', options: ['Make', 'Notion', 'OpenAI', 'Airtable', 'Power Automate', 'Zapier', 'Stitch', 'Google Cloud', 'AWS'] },
+  usage: { label: 'Usage', options: ['Quotidien', 'Occasio', 'Rare'] },
+  status: { label: 'Statut', options: ['Actif', 'Test', 'À voir', 'Archive'] },
+  prio: { label: 'Priorité', options: ['Urgent', 'Important', 'Normal', 'Faible'] },
+  type: { label: 'Type', options: ['Outil', 'Doc', 'Tutoriel', 'Article', 'Video', 'Formation', 'Recette', 'Service', 'Ressource'] }
+};
+
 const EditBookmarkForm = ({ bookmark, onClose, onSubmit, folders }) => {
+  const parseExistingTags = () => {
+    const tags = Array.isArray(bookmark.tags) ? bookmark.tags : [];
+    const categoryValues = { tool: '', usage: '', status: '' };
+    const otherTags = [];
+
+    tags.forEach(tag => {
+      const [key, val] = tag.split(':');
+      if (key && val && categoryValues[key] !== undefined) {
+        // Find matching option (case insensitive)
+        const option = TAG_CATEGORIES[key].options.find(opt => opt.toLowerCase() === val.toLowerCase());
+        if (option) categoryValues[key] = option;
+        else otherTags.push(tag);
+      } else {
+        otherTags.push(tag);
+      }
+    });
+
+    return { categoryValues, otherTags: otherTags.join(', ') };
+  };
+
+  const initialParsed = parseExistingTags();
+
   const [formData, setFormData] = useState({
     title: bookmark.title || '',
     url: bookmark.url || '',
-    tags: bookmark.tags ? (Array.isArray(bookmark.tags) ? bookmark.tags.join(', ') : bookmark.tags) : '',
     folderId: bookmark.folderId || '',
     description: bookmark.description || '',
     faviconUrl: bookmark.faviconUrl || '',
     isPrivate: !!bookmark.isPrivate,
-    isFavorite: !!bookmark.isFavorite
+    isFavorite: !!bookmark.isFavorite,
+    categoryValues: initialParsed.categoryValues,
+    project: initialParsed.project, // Separated project field
+    otherTags: initialParsed.otherTags
   });
 
   const [isAutoFetching, setIsAutoFetching] = useState(false);
@@ -40,12 +72,20 @@ const EditBookmarkForm = ({ bookmark, onClose, onSubmit, folders }) => {
     if (!/^https?:\/\//i.test(url)) {
       url = 'https://' + url;
     }
-    
-    const tags = typeof formData.tags === 'string' 
-      ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) 
-      : formData.tags;
 
-    onSubmit({ ...formData, url, tags });
+    // Combine guided tags and other tags
+    const structuredTags = Object.entries(formData.categoryValues)
+      .filter(([_, val]) => val)
+      .map(([cat, val]) => `${cat}:${val.toLowerCase()}`);
+    
+    if (formData.project) {
+      structuredTags.push(`projet:${formData.project}`);
+    }
+    
+    const manualTags = formData.otherTags.split(',').map(t => t.trim()).filter(Boolean);
+    const finalTags = [...new Set([...structuredTags, manualTags.map(t => t.toLowerCase())].flat())];
+
+    onSubmit({ ...formData, url, tags: finalTags });
   };
 
   return createPortal(
@@ -134,18 +174,55 @@ const EditBookmarkForm = ({ bookmark, onClose, onSubmit, folders }) => {
               </select>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-4">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                <Tag size={12} className="text-purple-500" /> Tags
+                <Tag size={12} className="text-purple-500" /> Catégorisation Intelligente
               </label>
-              <input
-                type="text"
-                placeholder="tool:make, prio:1, type:doc"
-                className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl p-3 focus:border-purple-500 focus:bg-white outline-none transition-all placeholder-slate-400 font-medium"
-                value={formData.tags}
-                onChange={e => setFormData({...formData, tags: e.target.value})}
-              />
-              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">Format conseillé: clé:valeur (ex: tool:make)</p>
+              
+              <div className="grid grid-cols-3 gap-3">
+                {Object.entries(TAG_CATEGORIES).map(([key, cat]) => (
+                  <div key={key} className="space-y-1.5">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter ml-1">{cat.label}</p>
+                    <select
+                      value={formData.categoryValues[key]}
+                      onChange={(e) => setFormData({
+                        ...formData, 
+                        categoryValues: { ...formData.categoryValues, [key]: e.target.value }
+                      })}
+                      className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl p-2.5 text-xs font-bold outline-none focus:border-purple-500 transition-all cursor-pointer"
+                    >
+                      <option value="">Aucun</option>
+                      {cat.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                    </select>
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-1.5 mt-4">
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter ml-1">Projet</p>
+                <input
+                  type="text"
+                  placeholder="Ex: ARCS, API, RH..."
+                  list="project-suggestions"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl p-3 focus:border-purple-500 focus:bg-white outline-none transition-all placeholder-slate-400 font-bold text-sm"
+                  value={formData.project}
+                  onChange={e => setFormData({...formData, project: e.target.value})}
+                />
+                <datalist id="project-suggestions">
+                   {[...new Set(folders.flatMap(f => []) /* Actually should fetch from bookmarks tags */)].map(p => <option key={p} value={p} />)}
+                </datalist>
+              </div>
+
+              <div className="space-y-1.5 mt-4">
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter ml-1">Autres Tags (libres)</p>
+                <input
+                  type="text"
+                  placeholder="prio:1, perso, r&d..."
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl p-3 focus:border-purple-500 focus:bg-white outline-none transition-all placeholder-slate-400 font-medium text-sm"
+                  value={formData.otherTags}
+                  onChange={e => setFormData({...formData, otherTags: e.target.value})}
+                />
+              </div>
             </div>
           </div>
 
@@ -212,7 +289,7 @@ const EditBookmarkForm = ({ bookmark, onClose, onSubmit, folders }) => {
           </div>
         </form>
       </motion.div>
-    </div>
+    </div>,
     document.body
   );
 };

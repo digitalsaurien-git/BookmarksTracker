@@ -70,7 +70,7 @@ const AddBookmarkForm = ({ onClose, onSubmit, folders, defaultFolderId }) => {
       .map(([cat, val]) => `${cat}:${val.toLowerCase()}`);
     
     const manualTags = formData.otherTags.split(',').map(t => t.trim()).filter(Boolean);
-    const finalTags = [...new Set([...structuredTags, ...manualTags])];
+    const finalTags = [...new Set([...structuredTags, ...manualTags.map(t => t.toLowerCase())])];
 
     onSubmit({ ...formData, url, tags: finalTags });
   };

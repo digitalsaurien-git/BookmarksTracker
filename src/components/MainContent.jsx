@@ -21,7 +21,9 @@ const MainContent = ({ bookmarks, folderId, onAdd }) => {
 
   const relevantFolderIds = getDescendantFolderIds(folderId);
   const isSearching = !!bookmarks.searchQuery;
-  const folderBookmarks = isSearching 
+  const isSmartView = bookmarks.activeFilter !== 'all';
+
+  const folderBookmarks = (isSearching || isSmartView) 
     ? bookmarks.bookmarks 
     : bookmarks.bookmarks.filter(b => relevantFolderIds.includes(b.folderId));
 

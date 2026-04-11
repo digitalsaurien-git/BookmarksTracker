@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExternalLink, MoreVertical, Trash2, Globe, Edit3 } from 'lucide-react';
+import { ExternalLink, MoreVertical, Trash2, Globe, Edit3, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import EditBookmarkForm from './EditBookmarkForm';
 

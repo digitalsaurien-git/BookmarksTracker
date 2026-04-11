@@ -83,7 +83,7 @@ const EditBookmarkForm = ({ bookmark, onClose, onSubmit, folders }) => {
     }
     
     const manualTags = formData.otherTags.split(',').map(t => t.trim()).filter(Boolean);
-    const finalTags = [...new Set([...structuredTags, manualTags.map(t => t.toLowerCase())].flat())];
+    const finalTags = [...new Set([...structuredTags, ...manualTags.map(t => t.toLowerCase())])];
 
     onSubmit({ ...formData, url, tags: finalTags });
   };

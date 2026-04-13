@@ -157,6 +157,12 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 - **Design Épuré** : Suppression des tags sur les vignettes pour maximiser l'espace et lisibilité accrue des titres (multi-ligne).
 - **Grille Dynamique** : Passage à 3 colonnes pour un confort de lecture optimal sur grand écran.
 
+### ✅ Correctifs & Stabilité (13/04/2026)
+- **Fix Supabase Sync** : Correction du mapping `user_id` qui empêchait la synchronisation cloud de fonctionner correctement.
+- **Sanitisation Profonde** : Système de réparation automatique des IDs et des métadonnées lors du chargement pour éviter les erreurs de clés React (Duplicate Keys).
+- **Optimisation SEO & Typography** : Intégration des polices Google Fonts et ajout des balises meta pour une meilleure expérience utilisateur.
+- **Résilience Réseau** : Amélioration des fallbacks vers LocalStorage et GitHub Sync en cas de défaillance du cloud.
+
 ---
 
 ## 12) Roadmap Successive

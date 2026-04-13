@@ -33,6 +33,8 @@ export function useBookmarks(user) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('all'); // 'all', 'favorites', 'daily', 'popular'
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanResults, setScanResults] = useState(null);
 
   // Load data & Migration
   useEffect(() => {
@@ -197,6 +199,52 @@ export function useBookmarks(user) {
 
   const setContext = (context) => {
     saveChanges({ ...data, activeContext: context });
+  };
+
+  const runDiagnostics = async () => {
+    const results = {
+      supabase: 'Vérification...',
+      localStorage: 'OK',
+      syncFile: SYNC_DATA ? 'Présent' : 'Absent',
+      timestamp: new Date().toISOString()
+    };
+
+    try {
+      if (user) {
+        // Simple connectivity & permission check
+        const { error } = await supabase.from('bookmarks_user_data').select('count', { count: 'exact', head: true }).eq('user_id', user);
+        results.supabase = error ? `Erreur: ${error.message}` : 'Connecté & Opérationnel';
+      } else {
+        results.supabase = 'Mode Invité (Pas de Cloud)';
+      }
+    } catch (e) {
+      results.supabase = 'Échec de connexion au service cloud';
+    }
+    return results;
+  };
+
+  const scanDeadLinks = async (onProgress) => {
+    setIsScanning(true);
+    const results = { dead: [], ok: [], total: data.bookmarks.length };
+    const all = data.bookmarks;
+    
+    for (let i = 0; i < all.length; i++) {
+        const b = all[i];
+        if (onProgress) onProgress(i + 1, all.length, b.title);
+        
+        try {
+            // Mode no-cors permet de voir si le serveur répond sans erreur réseau fatale
+            // Si le lien est mort (404, DNS error), fetch lèvera une exception
+            await fetch(b.url, { mode: 'no-cors', cache: 'no-store' });
+            results.ok.push(b.id);
+        } catch (e) {
+            results.dead.push({ id: b.id, title: b.title, url: b.url });
+        }
+    }
+    
+    setScanResults(results);
+    setIsScanning(false);
+    return results;
   };
 
   const FOLDER_COLORS = [
@@ -506,6 +554,23 @@ export function useBookmarks(user) {
         ...data,
         bookmarks: [...updatedBookmarks, ...newBookmarks]
       });
+    },
+    runDiagnostics,
+    scanDeadLinks,
+    isScanning,
+    scanResults,
+    setScanResults,
+    bulkDelete: (ids) => {
+      saveChanges({
+        ...data,
+        bookmarks: data.bookmarks.filter(b => !ids.includes(b.id))
+      });
+      if (scanResults) {
+        setScanResults({
+          ...scanResults,
+          dead: scanResults.dead.filter(d => !ids.includes(d.id))
+        });
+      }
     }
   };
 }

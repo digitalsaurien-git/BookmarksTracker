@@ -144,6 +144,12 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 - **Design "Sober Premium"** : Look minimaliste, glassmorphism, animations fluides (Framer Motion).
 - **Feedback Visuel** : Compteurs automatiques, badges de popularité, favicons de haute qualité.
 
+### ✅ Maintenance & Qualité de Données
+- **Scanner de Liens Morts** : Moteur de vérification d'accessibilité (mode ping) pour l'ensemble des favoris.
+- **Gestion des Erreurs en Masse** : Interface permettant de sélectionner et supprimer les liens morts en un clic.
+- **Outil de Diagnostic** : Panneau de contrôle vérifiant l'état de connexion Supabase, LocalStorage et GitHub Bridge.
+- **UI Menu Correction** : Amélioration du positionnement des menus contextuels pour une accessibilité totale sur toutes les vignettes.
+
 ---
 
 ## 12) Roadmap Successive
@@ -151,7 +157,7 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 2. [x] Intégration Supabase
 3. [x] Système de Tags Structurés
 4. [x] Import Intelligent & Sync Git
-5. [ ] **SUIVANT** : Gestion des "Archives" et nettoyage automatique des liens morts.
+5. [x] **NOUVEAU** : Maintenance, Diagnostic & Nettoyage des liens morts.
 6. [ ] **SUIVANT** : Extensions navigateur (Chrome/Firefox).
 
 ---

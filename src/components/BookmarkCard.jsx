@@ -64,19 +64,22 @@ const BookmarkCard = ({ bookmark, onDelete, onIncrement, onUpdate, folders }) =>
             {showMenu && (
               <>
                 <div 
-                  className="fixed inset-0 z-10" 
+                  className="fixed inset-0 z-[100]" 
                   onClick={() => setShowMenu(false)}
                 />
-                <div className="absolute right-0 mt-1 w-40 bg-white border border-slate-100 rounded-xl shadow-xl z-20 py-1 overflow-hidden animate-fade-in">
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-slate-100 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] z-[110] py-2 overflow-hidden animate-fade-in border-t-4 border-t-slate-900">
+                  <div className="px-4 py-2 mb-1 border-b border-slate-50">
+                    <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Options du lien</p>
+                  </div>
                   <button 
                     onClick={() => { setIsEditOpen(true); setShowMenu(false); }}
-                    className="w-full flex items-center gap-3 px-3 py-2 text-[12px] font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-[12px] font-bold text-slate-600 hover:bg-slate-50 transition-colors"
                   >
-                    <Edit3 size={14} /> Éditer
+                    <Edit3 size={14} className="text-blue-500" /> Éditer le lien
                   </button>
                   <button 
                     onClick={() => { onDelete(bookmark.id); setShowMenu(false); }}
-                    className="w-full flex items-center gap-3 px-3 py-2 text-[12px] font-bold text-rose-500 hover:bg-rose-50 transition-colors"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-[12px] font-bold text-rose-500 hover:bg-rose-50 transition-colors"
                   >
                     <Trash2 size={14} /> Supprimer
                   </button>

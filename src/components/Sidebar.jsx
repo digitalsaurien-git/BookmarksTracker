@@ -7,7 +7,7 @@ import {
   Sparkles, RefreshCw, Upload
 } from 'lucide-react';
 
-const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId, onOpenSmartImport }) => {
+const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId, onOpenSmartImport, onOpenPrefs }) => {
   const { folders, activeContext, setContext, addFolder, moveFolder, renameFolder } = bookmarks;
 
   const handleToggle = (id) => {
@@ -384,8 +384,11 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId, onOpenSmartImpor
           <Upload size={14} className="group-hover:translate-y-[-1px] transition-all" /> Sync via GitHub
         </button>
         <div className="flex items-center justify-between opacity-50 hover:opacity-100 transition-opacity">
-          <button className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-colors">
-            <Settings size={14} /> Préférences
+          <button 
+            onClick={onOpenPrefs}
+            className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-colors"
+          >
+            <Settings size={14} /> Préférences & Maintenance
           </button>
         </div>
       </div>

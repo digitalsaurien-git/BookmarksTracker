@@ -42,20 +42,37 @@ function App() {
         
         {/* User Profile / Logout */}
         <div className="p-8 border-t border-slate-50 bg-slate-50/20">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-lg shadow-slate-900/10">
-              <UserCircle size={24} />
+          {auth.isGuestMode ? (
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-2xl bg-indigo-100 flex items-center justify-center text-indigo-600 shadow-sm">
+                <UserCircle size={24} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-bold text-indigo-700 truncate leading-tight">Mode Local</p>
+                <button 
+                  onClick={auth.logout}
+                  className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-indigo-600 flex items-center gap-1.5 mt-1 transition-colors"
+                >
+                  <LogOut size={12} /> Se connecter
+                </button>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-bold truncate leading-tight">{auth.user?.email}</p>
-              <button 
-                onClick={auth.logout}
-                className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:text-rose-600 flex items-center gap-1.5 mt-1 transition-colors"
-              >
-                <LogOut size={12} /> Déconnexion
-              </button>
+          ) : (
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-lg shadow-slate-900/10">
+                <UserCircle size={24} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-bold truncate leading-tight">{auth.user?.email}</p>
+                <button 
+                  onClick={auth.logout}
+                  className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:text-rose-600 flex items-center gap-1.5 mt-1 transition-colors"
+                >
+                  <LogOut size={12} /> Déconnexion
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </aside>
 

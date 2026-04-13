@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, LogIn, UserPlus, ArrowRight, Loader2, Bookmark, Info, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { Mail, Lock, LogIn, UserPlus, ArrowRight, Loader2, Bookmark, Info, AlertTriangle, ShieldCheck, HardDrive } from 'lucide-react';
 
 const LoginView = ({ auth }) => {
   const [email, setEmail] = useState('');
@@ -156,6 +156,19 @@ const LoginView = ({ auth }) => {
                 {isRegistering ? "Me connecter" : "Créer un accès"}
               </span>
             </button>
+
+            {/* Guest Mode Button */}
+            <div className="w-full pt-4 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={auth.enterGuestMode}
+                className="w-full h-14 flex items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-slate-200 text-slate-500 hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50/40 transition-all font-bold text-sm"
+              >
+                <HardDrive size={18} />
+                Accès Local (Hors-ligne)
+              </button>
+              <p className="text-center text-[10px] text-slate-400 mt-2 font-medium">Utilise uniquement les données de votre navigateur</p>
+            </div>
           </div>
         </motion.div>
 

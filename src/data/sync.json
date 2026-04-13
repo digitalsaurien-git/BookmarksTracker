@@ -1,25 +1,35 @@
 {
-  "activeContext": "perso", 
+  "activeContext": "perso",
   "folders": [
     {
-      "id": "welcome-folder",
-      "name": "🚀 Mode Sync GitHub",
+      "id": "1775809828277",
+      "name": "Loisirs",
       "parentId": null,
-      "type": "perso",
-      "color": "text-indigo-500",
-      "isExpanded": true
+      "type": "perso"
     }
   ],
   "bookmarks": [
     {
-      "id": "welcome-bookmark",
-      "title": "Aide : Synchronisation entre postes",
-      "url": "https://github.com",
-      "description": "Si vous voyez ce message, c'est que l'application utilise le fichier `sync.json` comme source de secours. Pour retrouver vos vrais favoris : demandez-moi de copier vos données dans ce fichier sur votre poste perso, puis committez le changement.",
-      "folderId": "welcome-folder",
-      "type": "perso",
-      "tags": ["aide", "sync"],
-      "createdAt": "2026-04-13T09:00:00.000Z"
+      "id": "1775809873784",
+      "title": "Youtube",
+      "url": "https://youtube.com",
+      "tags": [
+        "video",
+        "divertissement"
+      ],
+      "folderId": null,
+      "type": "perso"
+    },
+    {
+      "id": "1775809897584",
+      "title": "Linear",
+      "url": "https://linear.app",
+      "tags": [
+        "gestion",
+        "pro"
+      ],
+      "folderId": null,
+      "type": "pro"
     }
   ]
 }

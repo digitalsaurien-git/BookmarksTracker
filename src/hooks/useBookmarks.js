@@ -40,79 +40,77 @@ export function useBookmarks(user) {
   useEffect(() => {
     const processData = (loadedData) => {
       let migrated = false;
-      let newFolders = [...loadedData.folders];
-      let newBookmarks = [...loadedData.bookmarks];
+      
+      // 0. Defensive check & structure recovery
+      if (!loadedData) return DEFAULT_DATA;
+      let newFolders = Array.isArray(loadedData.folders) ? [...loadedData.folders] : [];
+      let newBookmarks = Array.isArray(loadedData.bookmarks) ? [...loadedData.bookmarks] : [];
 
-      // Restore activeContext if missing
-      if (!loadedData.activeContext) {
-        loadedData.activeContext = 'perso';
-        migrated = true;
-      }
+      // 1. Ensure all items have non-empty IDs
+      const ensureId = (id, prefix) => {
+        if (!id || id === "") {
+          migrated = true;
+          return prefix + '-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now();
+        }
+        return id;
+      };
 
-      // 1. Identify root folders to remove
+      newFolders = newFolders.map(f => ({ ...f, id: ensureId(f.id, 'folder') }));
+      newBookmarks = newBookmarks.map(b => ({ ...b, id: ensureId(b.id, 'bookmark') }));
+
+      // 2. Restore activeContext if missing
+      let activeContext = loadedData.activeContext || 'perso';
+      if (!loadedData.activeContext) migrated = true;
+
+      // 3. Flatten folders > 2 levels deep & root cleanup
       const rootIds = ['root-perso', 'root-pro'];
       const rootsExist = newFolders.some(f => rootIds.includes(f.id));
 
       if (rootsExist) {
-        // Move children of roots to top-level (parentId = null)
-        newFolders = newFolders.map(f => {
-          if (rootIds.includes(f.parentId)) {
-            migrated = true;
-            return { ...f, parentId: null };
-          }
-          return f;
-        });
-
-        // Move bookmarks of roots to root (folderId = null)
-        newBookmarks = newBookmarks.map(b => {
-          if (rootIds.includes(b.folderId)) {
-            migrated = true;
-            return { ...b, folderId: null };
-          }
-          return b;
-        });
-
-        // Remove the root folders themselves
-        const filteredFolders = newFolders.filter(f => !rootIds.includes(f.id));
-        if (filteredFolders.length !== newFolders.length) {
-          migrated = true;
-          newFolders = filteredFolders;
-        }
+        migrated = true;
+        // Move children of roots to top-level
+        newFolders = newFolders.map(f => rootIds.includes(f.parentId) ? { ...f, parentId: null } : f);
+        // Move bookmarks of roots to top-level
+        newBookmarks = newBookmarks.map(b => rootIds.includes(b.folderId) ? { ...b, folderId: null } : b);
+        // Delete root folders
+        newFolders = newFolders.filter(f => !rootIds.includes(f.id));
       }
 
-      // 3. New Migration: Flatten any folders > 2 levels deep
-      const findDepth = (fid, currentFolders) => {
-        let depth = 0;
-        let current = currentFolders.find(f => f.id === fid);
-        while (current && current.parentId) {
-          depth++;
-          current = currentFolders.find(f => f.id === current.parentId);
-        }
-        return depth;
-      };
-
-      let deepFoldersFound = false;
+      // Hierarchy Depth check (max 2 levels)
+      const findParent = (fid, currentFolders) => currentFolders.find(f => f.id === fid);
       newFolders = newFolders.map(f => {
-        const depth = findDepth(f.id, newFolders);
-        if (depth > 1) { // 0: Root, 1: Subfolder, >1: Too deep
-          deepFoldersFound = true;
+        let parent = findParent(f.parentId, newFolders);
+        if (parent && parent.parentId) {
           migrated = true;
-          // Find root ancestor for this folder to move it to level 1
-          let ancestor = newFolders.find(x => x.id === f.parentId);
-          while (ancestor && ancestor.parentId) {
-            ancestor = newFolders.find(x => x.id === ancestor.parentId);
-          }
-          return { ...f, parentId: ancestor ? ancestor.id : null };
+          return { ...f, parentId: parent.parentId }; // Move up to level 1
         }
         return f;
       });
 
+      // 4. Data integrity: Ensure type, tags array, and non-empty values
+      newFolders = newFolders.map(f => ({ 
+        ...f, 
+        type: f.type || 'perso',
+        name: f.name || 'Sans titre'
+      }));
+      
+      newBookmarks = newBookmarks.map(b => ({ 
+        ...b, 
+        type: b.type || 'perso',
+        tags: (Array.isArray(b.tags) ? b.tags : []).filter(t => t && t.trim() !== ''),
+        title: b.title || 'Sans titre'
+      }));
+
+      const finalData = { 
+        activeContext,
+        folders: newFolders, 
+        bookmarks: newBookmarks 
+      };
+
       if (migrated) {
-        const finalData = { ...loadedData, folders: newFolders, bookmarks: newBookmarks };
         saveChanges(finalData);
-        return finalData;
       }
-      return loadedData;
+      return finalData;
     };
 
     if (!user) {
@@ -158,7 +156,7 @@ export function useBookmarks(user) {
             console.log("Initializing from GitHub sync file...");
             const processed = processData(SYNC_DATA);
             setData(processed);
-            saveChanges(processed);
+            // DO NOT SAVE TO LOCALSTORAGE AUTOMATICALLY TO AVOID OVERWRITING USER DATA
           }
         }
       } catch (e) {
@@ -212,7 +210,7 @@ export function useBookmarks(user) {
     try {
       if (user) {
         // Simple connectivity & permission check
-        const { error } = await supabase.from('bookmarks_user_data').select('count', { count: 'exact', head: true }).eq('user_id', user);
+        const { error } = await supabase.from('bookmarks_user_data').select('count', { count: 'exact', head: true }).eq('user_id', user.id);
         results.supabase = error ? `Erreur: ${error.message}` : 'Connecté & Opérationnel';
       } else {
         results.supabase = 'Mode Invité (Pas de Cloud)';
@@ -369,7 +367,9 @@ export function useBookmarks(user) {
   };
 
   const filteredBookmarks = data.bookmarks.filter(b => {
-    const contextMatch = b.type === data.activeContext;
+    // If item has no type, it belongs to 'perso' by default
+    const itemType = b.type || 'perso';
+    const contextMatch = itemType === data.activeContext;
     const query = (searchQuery || '').toLowerCase();
     
     // Combined filtering logic
@@ -407,7 +407,7 @@ export function useBookmarks(user) {
     activeContext: data.activeContext,
     setContext,
     folders: data.folders
-      .filter(f => f.type === data.activeContext)
+      .filter(f => (f.type || 'perso') === data.activeContext)
       .sort((a, b) => a.name.localeCompare(b.name)),
     bookmarks: filteredBookmarks,
     allBookmarks: data.bookmarks,

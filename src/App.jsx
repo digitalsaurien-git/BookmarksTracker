@@ -14,7 +14,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 function App() {
   const auth = useAuth();
-  const bookmarks = useBookmarks(auth.user?.id);
+  const bookmarks = useBookmarks(auth.user);
   const [selectedFolderId, setSelectedFolderId] = useState(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
@@ -127,6 +127,8 @@ function App() {
               onImport={bookmarks.bulkImport}
             />
           )}
+          <SmartImportModal 
+            isOpen={isSmartOpen} 
             onClose={() => setIsSmartOpen(false)} 
             bookmarks={bookmarks}
           />

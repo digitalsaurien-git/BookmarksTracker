@@ -121,16 +121,40 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 
 ---
 
-## 12) Évolutions Premium (v2.0)
-- **UI "Sober Premium"** : Interface épurée avec mesh gradients, flous de profondeur (glassmorphism) et typographie Outfit haute lisibilité.
-- **Importation Universelle** : Parseur Netscape supportant Chrome, Firefox, Safari.
-- **Synchronisation Cloud (Supabase)** : Persistance sécurisée multi-appareils.
-- **Expérience Bureau Class A** : Sidebar large (420px), barre de recherche centrale.
-- **Filtrage Intelligent (Vues)** :
-    - ⭐ **Favoris** : Liens marqués `isFavorite`.
-    - ⏱️ **Daily** : Filtre sur `usage:quotidien`.
-    - 📁 **Projets Actifs** : Regroupe les tags `projet:*` avec un `status:en-cours`.
-    - 🔭 **À Explorer** : Liens jamais cliqués ou tagués `status:a-explorer`.
-    - 🛠️ **Par Outil** : Navigation dynamique via les tags `tool:*`.
+## 11) Fonctionnalités développées (Status au 13/04/2026)
+
+### ✅ Core & Navigation
+- **Architecture Multi-Contexte** : Séparation complète Perso / Pro avec toggle instantané.
+- **Explorateur Récursif** : Gestion d'arborescence de dossiers avec Drag & Drop (Folders & Bookmarks).
+- **Navigation Intelligente** : Vues par défaut (Bibliothèque, Favoris, Usage Quotidien, Popularité).
+
+### ✅ Gestion des Favoris
+- **CRUD Complet** : Ajout, édition détaillée et suppression.
+- **Système de Tags Structurés** : Catégorisation guidée (`tool:`, `usage:`, `status:`, `projet:`, `prio:`, `type:`).
+- **Récupération Auto** : Auto-completion du titre et de la favicon via l'URL.
+- **Filtrage Dynamique** : Recherche ultra-rapide sur titres, URLs, descriptions et tags.
+
+### ✅ Synchronisation & Import/Export
+- **Cloud Sync** : Intégration Supabase pour la persistence temps-réel.
+- **GitHub Bridge** : Synchronisation via fichier `sync.json` pour les environnements pro restreints.
+- **Import Intelligent** : Parseur avec détection de doublons, détection d'ambiguïté et politique de fusion dimensionnelle.
+- **Export Universel** : Exportation HTML compatible navigateurs.
+
+### ✅ Design & UX
+- **Design "Sober Premium"** : Look minimaliste, glassmorphism, animations fluides (Framer Motion).
+- **Feedback Visuel** : Compteurs automatiques, badges de popularité, favicons de haute qualité.
+
+---
+
+## 12) Roadmap Successive
+1. [x] MVP Local
+2. [x] Intégration Supabase
+3. [x] Système de Tags Structurés
+4. [x] Import Intelligent & Sync Git
+5. [ ] **SUIVANT** : Gestion des "Archives" et nettoyage automatique des liens morts.
+6. [ ] **SUIVANT** : Extensions navigateur (Chrome/Firefox).
+
+---
+
 
 

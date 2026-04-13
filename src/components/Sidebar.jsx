@@ -144,7 +144,7 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId, onOpenSmartImpor
               className="overflow-hidden border-l border-slate-100 ml-7 mt-1"
             >
               {getSubfolders(folder.id).map(f => (
-                <FolderItem key={f.id} folder={f} level={0} />
+                <FolderItem key={f.id} folder={f} level={level + 1} />
               ))}
             </motion.div>
           )}

@@ -15,11 +15,14 @@ const EditBookmarkForm = ({ bookmark, onClose, onSubmit, folders }) => {
   const parseExistingTags = () => {
     const tags = Array.isArray(bookmark.tags) ? bookmark.tags : [];
     const categoryValues = { tool: '', usage: '', status: '' };
+    let project = '';
     const otherTags = [];
 
     tags.forEach(tag => {
       const [key, val] = tag.split(':');
-      if (key && val && categoryValues[key] !== undefined) {
+      if (key === 'projet') {
+        project = val;
+      } else if (key && val && categoryValues[key] !== undefined) {
         // Find matching option (case insensitive)
         const option = TAG_CATEGORIES[key].options.find(opt => opt.toLowerCase() === val.toLowerCase());
         if (option) categoryValues[key] = option;
@@ -29,7 +32,7 @@ const EditBookmarkForm = ({ bookmark, onClose, onSubmit, folders }) => {
       }
     });
 
-    return { categoryValues, otherTags: otherTags.join(', ') };
+    return { categoryValues, project, otherTags: otherTags.join(', ') };
   };
 
   const initialParsed = parseExistingTags();
@@ -209,7 +212,7 @@ const EditBookmarkForm = ({ bookmark, onClose, onSubmit, folders }) => {
                   onChange={e => setFormData({...formData, project: e.target.value})}
                 />
                 <datalist id="project-suggestions">
-                   {[...new Set(folders.flatMap(f => []) /* Actually should fetch from bookmarks tags */)].map(p => <option key={p} value={p} />)}
+                   {[...new Set(folders.flatMap(f => []) /* This is just a placeholder, in a real hook it would be passed */)].map(p => <option key={p} value={p} />)}
                 </datalist>
               </div>
 

@@ -33,6 +33,7 @@ const AddBookmarkForm = ({ onClose, onSubmit, folders, defaultFolderId }) => {
       usage: '',
       status: ''
     },
+    project: '',
     otherTags: ''
   });
 
@@ -68,6 +69,10 @@ const AddBookmarkForm = ({ onClose, onSubmit, folders, defaultFolderId }) => {
     const structuredTags = Object.entries(formData.categoryValues)
       .filter(([_, val]) => val)
       .map(([cat, val]) => `${cat}:${val.toLowerCase()}`);
+    
+    if (formData.project) {
+      structuredTags.push(`projet:${formData.project.toLowerCase()}`);
+    }
     
     const manualTags = formData.otherTags.split(',').map(t => t.trim()).filter(Boolean);
     const finalTags = [...new Set([...structuredTags, ...manualTags.map(t => t.toLowerCase())])];
@@ -190,6 +195,17 @@ const AddBookmarkForm = ({ onClose, onSubmit, folders, defaultFolderId }) => {
                     </select>
                   </div>
                 ))}
+              </div>
+
+              <div className="space-y-1.5 mt-4">
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter ml-1">Projet</p>
+                <input
+                  type="text"
+                  placeholder="Ex: ARCS, API, RH..."
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl p-3 focus:border-purple-500 focus:bg-white outline-none transition-all placeholder-slate-400 font-bold text-sm"
+                  value={formData.project}
+                  onChange={e => setFormData({...formData, project: e.target.value})}
+                />
               </div>
 
               <div className="space-y-1.5 mt-4">

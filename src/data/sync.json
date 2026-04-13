@@ -1,0 +1,25 @@
+{
+  "activeContext": "perso", 
+  "folders": [
+    {
+      "id": "welcome-folder",
+      "name": "🚀 Mode Sync GitHub",
+      "parentId": null,
+      "type": "perso",
+      "color": "text-indigo-500",
+      "isExpanded": true
+    }
+  ],
+  "bookmarks": [
+    {
+      "id": "welcome-bookmark",
+      "title": "Aide : Synchronisation entre postes",
+      "url": "https://github.com",
+      "description": "Si vous voyez ce message, c'est que l'application utilise le fichier `sync.json` comme source de secours. Pour retrouver vos vrais favoris : demandez-moi de copier vos données dans ce fichier sur votre poste perso, puis committez le changement.",
+      "folderId": "welcome-folder",
+      "type": "perso",
+      "tags": ["aide", "sync"],
+      "createdAt": "2026-04-13T09:00:00.000Z"
+    }
+  ]
+}

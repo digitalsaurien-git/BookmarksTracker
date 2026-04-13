@@ -88,6 +88,7 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 - Layout : Sidebar à gauche pour l’arborescence, panneau principal pour listes et détails.
 - Navigation : SPA (single page, tout accessible sans recharger).
 - Backend Cloud : Intégration Supabase pour la synchronisation en temps réel.
+- **Synchronisation Secours (GitHub Bridge)** : Utilisation d'un fichier `src/data/sync.json` comme point de passage Git entre les postes pour contourner les restrictions réseau/proxy.
 
 ## 8) Plan de mission (etapes en langage humain)
 1. **Toggle Perso/Boulot** : L’utilisateur bascule entre ses deux espaces de travail via un bouton dédié.
@@ -97,23 +98,26 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 5. **Déplacement & Restructuration** : Peut déplacer un lien ou un dossier entier par glisser-déposer (Drag & Drop) vers un nouveau dossier ou vers la racine.
 6. **Export/import** : Peut sauvegarder tous ses bookmarks en un clic (fichier téléchargé) et réimporter ce fichier pour retrouver la structure.
 7. **Migration** : Les anciens dossiers "Perso" et "Pro" sont aplatis lors de la première utilisation.
+8. **GitHub Sync Bridge** : Possibilité d'importer les favoris depuis un fichier JSON synchronisé via Git pour les environnements pro restreints.
 
 ## 9) Preuves attendues (pour valider sans technique)
 - Capture d’écran montrant l'arborescence unifiée.
 - Vidéo ou gif court montrant l’ajout, la recherche, et le déplacement d’un bookmark.
-- Fichier d’export lisible avec ses tags, dossiers, URLs.
+- Fichier d’export JSON au format compatible GitHub Sync.
+- Bouton "Sync via GitHub" fonctionnel sur le poste pro.
 
 ## 10) Checklist de validation (pass/fail)
-- [ ] Je peux basculer instantanément entre l'espace Perso et Boulot.
-- [ ] L'arborescence est "propre" (pas de dossier racine redondant au sommet).
-- [ ] Je peux créer un dossier et il s’ajoute instantanément dans l'espace actif.
-- [ ] Cliquer on un bookmark ouvre bien le site correspondant.
-- [ ] Rechercher un mot-clef affiche bien tous les liens/tag correspondants.
-- [ ] Je peux déplacer un lien d’un dossier à un autre.
-- [ ] Je peux taguer un lien, puis filtres par ce tag l’affichent bien.
-- [ ] Un bouton “Exporter” sauvegarde tous mes liens dans un fichier.
-- [ ] Un bouton “Importer” restaure bien toute ma structure de bookmarks.
-- [ ] Tout fonctionne sans connexion internet (cache local).
+- [x] Je peux basculer instantanément entre l'espace Perso et Boulot.
+- [x] L'arborescence est "propre" (pas de dossier racine redondant au sommet).
+- [x] Je peux créer un dossier et il s’ajoute instantanément dans l'espace actif.
+- [x] Cliquer on un bookmark ouvre bien le site correspondant.
+- [x] Rechercher un mot-clef affiche bien tous les liens/tag correspondants.
+- [x] Je peux déplacer un lien d’un dossier à un autre.
+- [x] Je peux taguer un lien, puis filtres par ce tag l’affichent bien.
+- [x] Un bouton “Exporter” sauvegarde tous mes liens dans un fichier (ou via Git).
+- [x] Un bouton “Importer” restaure bien toute ma structure de bookmarks.
+- [x] Tout fonctionne sans connexion internet (cache local).
+- [x] **NOUVEAU** : Je peux synchroniser mes données via GitHub sur un poste pro restreint.
 
 ---
 

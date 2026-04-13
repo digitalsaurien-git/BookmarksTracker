@@ -4,7 +4,7 @@ import {
   Folder, FolderOpen, ChevronRight, ChevronDown, 
   Library, Hash, Briefcase, User, MoreVertical,
   PlusCircle, FolderPlus, Compass, Settings, Trash2, Edit2,
-  Sparkles, RefreshCw
+  Sparkles, RefreshCw, Github
 } from 'lucide-react';
 
 const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId, onOpenSmartImport }) => {
@@ -375,6 +375,13 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId, onOpenSmartImpor
           className="w-full flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all group"
         >
           <RefreshCw size={14} className="group-hover:rotate-180 transition-transform duration-500" /> Import Intelligent
+        </button>
+        <button 
+          onClick={() => bookmarks.forceSyncFromFile()}
+          className="w-full flex items-center gap-3 px-4 py-3 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all group shadow-lg shadow-slate-200"
+          title="Charger les favoris depuis le repo Git (sync.json)"
+        >
+          <Github size={14} className="group-hover:scale-110 transition-all" /> Sync via GitHub
         </button>
         <div className="flex items-center justify-between opacity-50 hover:opacity-100 transition-opacity">
           <button className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-colors">

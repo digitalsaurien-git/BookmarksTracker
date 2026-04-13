@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../supabase';
+import SYNC_DATA from '../data/sync.json';
 
 const STORAGE_KEY = 'bookmarks_tracker_data';
 
@@ -124,6 +125,7 @@ export function useBookmarks(user) {
     const loadCloudData = async () => {
       setIsSyncing(true);
       try {
+        // Check if we are offline or if Supabase is blocked
         const { data: cloudData, error } = await supabase
           .from('bookmarks_user_data')
           .select('payload')
@@ -137,20 +139,35 @@ export function useBookmarks(user) {
         if (cloudData?.payload) {
           setData(processData(cloudData.payload));
         } else {
+          // Fallback 1: LocalStorage
           const localSaved = localStorage.getItem(STORAGE_KEY);
           if (localSaved) {
             const parsed = JSON.parse(localSaved);
             const processed = processData(parsed);
             setData(processed);
+            // Try to sync to cloud if possible
             await supabase.from('bookmarks_user_data').insert({
               user_id: user.id,
               payload: processed,
               updated_at: new Date().toISOString()
-            });
+            }).catch(() => console.log("Not possible to sync to cloud at the moment (likely network restrictions)."));
+          } else if (SYNC_DATA && SYNC_DATA.bookmarks?.length > 0) {
+            // Fallback 2: GitHub Sync File (for professional environments)
+            console.log("Initializing from GitHub sync file...");
+            const processed = processData(SYNC_DATA);
+            setData(processed);
+            saveChanges(processed);
           }
         }
       } catch (e) {
-        console.error('Error loading cloud data:', e);
+        console.error('Error loading cloud data (Network/Proxy issues possible):', e);
+        // On error, still check local and sync file
+        const localSaved = localStorage.getItem(STORAGE_KEY);
+        if (localSaved) {
+          setData(processData(JSON.parse(localSaved)));
+        } else if (SYNC_DATA && SYNC_DATA.bookmarks?.length > 0) {
+          setData(processData(SYNC_DATA));
+        }
       } finally {
         setIsSyncing(false);
       }
@@ -369,6 +386,14 @@ export function useBookmarks(user) {
     isSyncing,
     importData: (newData) => saveChanges(newData),
     exportData: () => JSON.stringify(data, null, 2),
+    forceSyncFromFile: () => {
+      if (SYNC_DATA && confirm("Voulez-vous écraser vos favoris locaux par ceux du fichier de synchronisation GitHub ?")) {
+        const processed = processData(SYNC_DATA);
+        saveChanges(processed);
+        return true;
+      }
+      return false;
+    },
     analyzeImport: (importedBookmarks) => {
       const results = {
         recognized: 0,

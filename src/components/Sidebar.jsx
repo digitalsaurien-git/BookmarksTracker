@@ -269,44 +269,36 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId, onOpenSmartImpor
         </div>
       </div>
 
-      {/* Toolbox & Projects Sections */}
-      <div className="mb-14">
-        <div className="flex items-center gap-3 mb-8 px-2">
-          <Briefcase size={14} className="text-indigo-500" />
-          <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Mes Projets</h3>
+      {/* Projects Dropdown */}
+      <div className="mb-10">
+        <div className="flex items-center gap-3 mb-4 px-2">
+          <Briefcase size={12} className="text-indigo-500" />
+          <h3 className="text-[9px] font-black text-slate-300 uppercase tracking-[0.3em]">Mes Projets</h3>
         </div>
-        <div className="flex flex-wrap gap-2 px-2 mb-10">
-          {bookmarks.projects.map(projectTag => {
-            const projectName = projectTag.split(':')[1];
-            const isActive = bookmarks.searchQuery === projectTag;
-            return (
-              <button
-                key={projectTag}
-                onClick={() => {
-                  bookmarks.setSearchQuery(isActive ? '' : projectTag);
-                  bookmarks.setActiveFilter('all');
-                  onSelectFolder(null);
-                }}
-                className={`px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all border ${
-                  isActive 
-                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-200' 
-                    : 'bg-indigo-50 text-indigo-500 border-indigo-100 hover:bg-slate-100'
-                }`}
-              >
-                {projectName}
-              </button>
-            );
-          })}
-          {bookmarks.projects.length === 0 && (
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest px-1 italic">Aucun projet tagué</p>
-          )}
+        <div className="px-2 mb-8">
+           <select 
+              className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:border-indigo-500 transition-all appearance-none cursor-pointer"
+              value={bookmarks.searchQuery.startsWith('projet:') ? bookmarks.searchQuery : ''}
+              onChange={(e) => {
+                bookmarks.setSearchQuery(e.target.value);
+                bookmarks.setActiveFilter('all');
+                onSelectFolder(null);
+              }}
+           >
+              <option value="">Tous les projets</option>
+              {bookmarks.projects.map(projectTag => (
+                <option key={projectTag} value={projectTag}>
+                  {projectTag.split(':')[1].toUpperCase()}
+                </option>
+              ))}
+           </select>
         </div>
 
-        <div className="flex items-center gap-3 mb-8 px-2">
-          <Settings size={14} className="text-purple-500" />
-          <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Boîte à outils</h3>
+        <div className="flex items-center gap-3 mb-4 px-2">
+          <Settings size={12} className="text-purple-500" />
+          <h3 className="text-[9px] font-black text-slate-300 uppercase tracking-[0.3em]">Boîte à outils</h3>
         </div>
-        <div className="flex flex-wrap gap-2 px-2">
+        <div className="flex flex-wrap gap-1.5 px-2">
           {[...new Set(
             bookmarks.allBookmarks
               .filter(b => b.type === bookmarks.activeContext)
@@ -323,24 +315,16 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId, onOpenSmartImpor
                   bookmarks.setActiveFilter('all');
                   onSelectFolder(null);
                 }}
-                className={`px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all border ${
+                className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all border ${
                   isActive 
-                    ? 'bg-purple-600 text-white border-purple-600 shadow-lg shadow-purple-200' 
-                    : 'bg-slate-50 text-slate-500 border-slate-100 hover:bg-slate-100 hover:text-slate-900'
+                    ? 'bg-purple-600 text-white border-purple-600' 
+                    : 'bg-slate-50 text-slate-400 border-slate-100 hover:bg-slate-100 hover:text-slate-900'
                 }`}
               >
                 {toolName}
               </button>
             );
           })}
-          {[...new Set(
-            bookmarks.allBookmarks
-              .filter(b => b.type === bookmarks.activeContext)
-              .flatMap(b => Array.isArray(b.tags) ? b.tags : [])
-              .filter(t => t.startsWith('tool:'))
-          )].length === 0 && (
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest px-1 italic">Aucun outil tagué</p>
-          )}
         </div>
       </div>
 

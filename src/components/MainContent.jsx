@@ -3,7 +3,7 @@ import BookmarkCard from './BookmarkCard';
 import { ChevronRight, LayoutGrid, Layers, Ghost, Sparkles } from 'lucide-react';
 
 const MainContent = ({ bookmarks, folderId, onAdd }) => {
-  const [sortOrder, setSortOrder] = React.useState('alpha'); // 'alpha' or 'hits'
+  const [sortOrder, setSortOrder] = React.useState('hits'); // Default to popularity (hits)
   const currentFolder = bookmarks.folders.find(f => f.id === folderId);
   
   const folderPath = [];
@@ -106,7 +106,7 @@ const MainContent = ({ bookmarks, folderId, onAdd }) => {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
         {sortedBookmarks.map(bookmark => (
           <BookmarkCard 
             key={bookmark.id} 

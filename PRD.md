@@ -150,6 +150,13 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 - **Outil de Diagnostic** : Panneau de contrôle vérifiant l'état de connexion Supabase, LocalStorage et GitHub Bridge.
 - **UI Menu Correction** : Amélioration du positionnement des menus contextuels pour une accessibilité totale sur toutes les vignettes.
 
+### ✅ Optimisations UI & Tri
+- **Tri Intelligent** : Dossiers classés alphabétiquement et favoris classés par popularité (clics) par défaut.
+- **Sidebar Compacte** : Transformation des tags projets en menu déroulant et réduction générale des polices.
+- **Hiérarchie Stricte** : Les sous-dossiers sont désormais proprement imbriqués et masqués de la racine.
+- **Design Épuré** : Suppression des tags sur les vignettes pour maximiser l'espace et lisibilité accrue des titres (multi-ligne).
+- **Grille Dynamique** : Passage à 3 colonnes pour un confort de lecture optimal sur grand écran.
+
 ---
 
 ## 12) Roadmap Successive
@@ -157,8 +164,9 @@ Créer une application de gestion intelligente de bookmarks pour un usage person
 2. [x] Intégration Supabase
 3. [x] Système de Tags Structurés
 4. [x] Import Intelligent & Sync Git
-5. [x] **NOUVEAU** : Maintenance, Diagnostic & Nettoyage des liens morts.
-6. [ ] **SUIVANT** : Extensions navigateur (Chrome/Firefox).
+5. [x] Maintenance, Diagnostic & Nettoyage
+6. [x] **NOUVEAU** : Optimisation UI, Tri & Hiérarchie.
+7. [ ] **SUIVANT** : Extensions navigateur (Chrome/Firefox).
 
 ---
 

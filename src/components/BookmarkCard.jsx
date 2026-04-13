@@ -42,11 +42,11 @@ const BookmarkCard = ({ bookmark, onDelete, onIncrement, onUpdate, folders }) =>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="text-[14px] font-black text-slate-900 truncate">
+            <h3 className="text-[13px] font-black text-slate-900 line-clamp-2 leading-[1.3]">
               {bookmark.title || 'Sans titre'}
             </h3>
           </div>
-          <p className="text-[10px] font-bold text-slate-400 truncate uppercase tracking-widest">
+          <p className="text-[10px] font-bold text-slate-400 truncate uppercase tracking-widest mt-1">
             {getDomain(bookmark.url)}
           </p>
         </div>
@@ -102,7 +102,7 @@ const BookmarkCard = ({ bookmark, onDelete, onIncrement, onUpdate, folders }) =>
       </div>
 
       {bookmark.description && (
-        <p className="text-xs text-slate-500 font-medium line-clamp-2 leading-relaxed px-1">
+        <p className="text-[11px] text-slate-500 font-medium line-clamp-2 leading-relaxed px-1">
           {bookmark.description}
         </p>
       )}
@@ -116,29 +116,6 @@ const BookmarkCard = ({ bookmark, onDelete, onIncrement, onUpdate, folders }) =>
             {bookmark.clicks} PV
           </div>
         )}
-        
-        {Array.isArray(bookmark.tags) && bookmark.tags.map((tag, idx) => {
-          const isStructured = tag.includes(':');
-          const [key, val] = isStructured ? tag.split(':') : [null, tag];
-          
-          return (
-            <span 
-              key={idx}
-              className={`px-2 py-0.5 rounded-md text-[9px] font-bold tracking-tight border ${
-                isStructured 
-                  ? 'bg-slate-900 text-white border-slate-900' 
-                  : 'bg-white text-slate-500 border-slate-100'
-              }`}
-            >
-              {isStructured ? (
-                <>
-                  <span className="opacity-50 font-medium">{key}:</span>
-                  <span>{val}</span>
-                </>
-              ) : tag}
-            </span>
-          );
-        })}
       </div>
 
       <AnimatePresence>

@@ -386,6 +386,7 @@ export function useBookmarks(user) {
       filterMatch = top10Ids.includes(b.id);
     }
     
+    // Default secondary filter: if no search or special view, internal MainContent will sort by hits
     const searchMatch = !query || 
                        (b.title || '').toLowerCase().includes(query) || 
                        (b.url || '').toLowerCase().includes(query) ||
@@ -405,7 +406,9 @@ export function useBookmarks(user) {
     data,
     activeContext: data.activeContext,
     setContext,
-    folders: data.folders.filter(f => f.type === data.activeContext),
+    folders: data.folders
+      .filter(f => f.type === data.activeContext)
+      .sort((a, b) => a.name.localeCompare(b.name)),
     bookmarks: filteredBookmarks,
     allBookmarks: data.bookmarks,
     addFolder,

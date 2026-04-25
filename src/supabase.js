@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://missing-url.supabase.co'
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'missing-key'
 
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("❌ ERREUR CRITIQUE: Configuration Supabase manquante ! Vérifiez que les variables d'environnement VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY sont définies dans votre fichier .env et que vous avez redémarré votre serveur Vite.")
+if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+  console.error("❌ ERREUR CRITIQUE: Configuration Supabase manquante ! Vérifiez que les variables d'environnement VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY sont définies dans Vercel.")
 }
 
 export const supabase = createClient(supabaseUrl, supabaseKey)

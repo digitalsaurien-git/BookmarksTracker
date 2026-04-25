@@ -1,6 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'https://qsnezzijezlfsriwhgwc.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzbmV6emlqZXpsZnNyaXdoZ3djIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ1NDA4NjksImV4cCI6MjA2MDExNjg2OX0.2mjQi4AHEmvXlfMDzbjC3Ps4HqT1gmsk0ToXGTXwyMk'
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error("❌ ERREUR CRITIQUE: Configuration Supabase manquante ! Vérifiez que les variables d'environnement VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY sont définies dans votre fichier .env et que vous avez redémarré votre serveur Vite.")
+}
 
 export const supabase = createClient(supabaseUrl, supabaseKey)

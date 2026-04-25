@@ -26,14 +26,16 @@ const BookmarkCard = ({ bookmark, onDelete, onIncrement, onUpdate, folders }) =>
       layout
       draggable
       onDragStart={onDragStart}
-      className="premium-card p-4 flex flex-col gap-3 group cursor-grab active:cursor-grabbing border-slate-100 hover:border-blue-100 relative overflow-hidden"
+      className={`premium-card p-4 flex flex-col gap-3 group cursor-grab active:cursor-grabbing border-slate-100 hover:border-blue-100 relative ${showMenu ? 'z-50' : 'z-10'}`}
     >
-      {bookmark.isFavorite && (
-        <div className="absolute top-0 right-0 w-8 h-8 flex items-center justify-center translate-x-1 -translate-y-1">
-          <div className="absolute inset-0 bg-amber-500 rotate-45 translate-x-4 -translate-y-4" />
-          <Sparkles size={10} className="text-white relative z-10 mr-[-12px] mt-[-12px]" fill="currentColor" />
-        </div>
-      )}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ borderRadius: 'inherit' }}>
+        {bookmark.isFavorite && (
+          <div className="absolute top-0 right-0 w-8 h-8 flex items-center justify-center translate-x-1 -translate-y-1">
+            <div className="absolute inset-0 bg-amber-500 rotate-45 translate-x-4 -translate-y-4" />
+            <Sparkles size={10} className="text-white relative z-10 mr-[-12px] mt-[-12px]" fill="currentColor" />
+          </div>
+        )}
+      </div>
 
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all duration-300 shadow-sm flex-shrink-0">
@@ -113,7 +115,7 @@ const BookmarkCard = ({ bookmark, onDelete, onIncrement, onUpdate, folders }) =>
             className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-md text-[9px] font-black tracking-widest border border-blue-100" 
             title={`${bookmark.clicks} visites`}
           >
-            {bookmark.clicks} PV
+            {bookmark.clicks}
           </div>
         )}
       </div>

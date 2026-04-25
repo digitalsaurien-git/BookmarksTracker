@@ -46,7 +46,8 @@ export function useBookmarks(user) {
     const { data: foldersData, error: foldersError } = await supabase
       .from('bt_folders')
       .select('*')
-      .eq('user_id', user.id);
+      .eq('user_id', user.id)
+      .order('id');
 
     if (foldersError) {
         console.error("[Sync] Erreur bt_folders:", foldersError.message);
@@ -60,6 +61,7 @@ export function useBookmarks(user) {
             .from('bt_bookmarks')
             .select('*')
             .eq('user_id', user.id)
+            .order('id')
             .range(from, from + 999);
         
         if (error) {
@@ -97,11 +99,15 @@ export function useBookmarks(user) {
         folderId: b.folder_id,
         type: mapScopeToType(b.scope),
         tags: b.tags || [],
-        isFavorite: b.is_favorite,
-        clicks: b.clicks,
+        isFavorite: b.is_favorite === true || String(b.is_favorite) === 'true',
+        clicks: parseInt(b.clicks) || 0,
         faviconUrl: b.favicon_url,
         createdAt: b.created_at
     }));
+
+    const favoritesCount = loadedBookmarks.filter(b => b.isFavorite).length;
+    console.log(`[Sync] Mappage terminé: ${loadedBookmarks.length} favoris chargés au total.`);
+    console.log(`[Sync] Dont coups de coeur détectés (isFavorite=true): ${favoritesCount}`);
 
     setData(prev => ({ ...prev, folders: loadedFolders, bookmarks: loadedBookmarks }));
     return true;

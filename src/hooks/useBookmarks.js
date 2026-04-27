@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../supabase';
 import SYNC_DATA from '../data/sync.json';
 
@@ -39,8 +39,47 @@ export function useBookmarks(user) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
   const [isSyncing, setIsSyncing] = useState(false);
+  // Load initial scan session from localStorage
+  const getInitialScanSession = () => {
+    try {
+      const saved = localStorage.getItem('bookmarkTracker_linkCheckSession');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.scanStatus === 'scanning') {
+          parsed.scanStatus = 'stopped';
+          parsed.restored = true;
+        }
+        return parsed;
+      }
+    } catch (e) {
+      console.error('Error loading scan session', e);
+    }
+    return null;
+  };
+
+  const initialSession = getInitialScanSession();
+
   const [isScanning, setIsScanning] = useState(false);
-  const [scanResults, setScanResults] = useState(null);
+  const [scanStatus, setScanStatus] = useState(initialSession ? initialSession.scanStatus : 'idle'); // idle, scanning, completed, stopped, error
+  const [scanResults, setScanResults] = useState(initialSession ? initialSession.scanResults : null);
+  const [scanStats, setScanStats] = useState(initialSession ? initialSession.scanStats : { total: 0, analyzed: 0, ok: 0, suspect: 0, dead: 0 });
+  const [scanProgress, setScanProgress] = useState(initialSession ? initialSession.scanProgress : { current: 0, total: 0, title: '' });
+  const [scanRestored, setScanRestored] = useState(initialSession ? initialSession.restored : false);
+  const isStoppingRef = useRef(false);
+
+  const saveScanSession = (status, results, stats, progress) => {
+    try {
+      localStorage.setItem('bookmarkTracker_linkCheckSession', JSON.stringify({
+        scanStatus: status,
+        scanResults: results,
+        scanStats: stats,
+        scanProgress: progress,
+        updatedAt: new Date().toISOString()
+      }));
+    } catch (e) {
+      console.error('Failed to save scan session', e);
+    }
+  };
 
   const fetchCloudData = async () => {
     const { data: foldersData, error: foldersError } = await supabase
@@ -556,20 +595,64 @@ export function useBookmarks(user) {
   };
 
   const bulkDelete = async (ids) => {
-     if (user) {
-         const { error } = await supabase.from('bt_bookmarks').delete().in('id', ids);
-         if (error) { console.error("Error in bulk delete", error); return; }
-     }
-     setData(prev => ({
-        ...prev,
-        bookmarks: prev.bookmarks.filter(b => !ids.includes(b.id))
-     }));
-     if (scanResults) {
-        setScanResults({
-          ...scanResults,
-          dead: scanResults.dead.filter(d => !ids.includes(d.id))
-        });
+    console.log(`[BulkDelete] Tentative de suppression de ${ids?.length || 0} bookmarks.`, ids);
+    
+    if (!ids || ids.length === 0) return { success: false, error: "Aucune sélection." };
+
+    const validIds = ids.filter(id => id && typeof id === 'string');
+    const invalidCount = ids.length - validIds.length;
+
+    try {
+      if (user && validIds.length > 0) {
+        const { error } = await supabase.from('bt_bookmarks').delete().in('id', validIds);
+        if (error) throw error;
       }
+
+      // Update main bookmarks state
+      setData(prev => ({
+        ...prev,
+        bookmarks: prev.bookmarks.filter(b => !validIds.includes(b.id))
+      }));
+
+      // Update scan session state if active
+      if (scanResults) {
+        const affectedItems = scanResults.filter(item => validIds.includes(item.id));
+        const deletedStats = affectedItems.reduce((acc, item) => {
+          if (item.status === 'OK') acc.ok++;
+          else if (item.status === 'SUSPECT') acc.suspect++;
+          else if (item.status === 'MORT_PROBABLE') acc.dead++;
+          return acc;
+        }, { ok: 0, suspect: 0, dead: 0 });
+
+        const newResults = scanResults.filter(item => !validIds.includes(item.id));
+        setScanResults(newResults);
+
+        const newStats = {
+          ...scanStats,
+          total: Math.max(0, scanStats.total - validIds.length),
+          analyzed: Math.max(0, scanStats.analyzed - validIds.length),
+          ok: Math.max(0, scanStats.ok - deletedStats.ok),
+          suspect: Math.max(0, scanStats.suspect - deletedStats.suspect),
+          dead: Math.max(0, scanStats.dead - deletedStats.dead)
+        };
+        setScanStats(newStats);
+
+        const newProgress = {
+          ...scanProgress,
+          total: Math.max(0, scanProgress.total - validIds.length),
+          current: Math.max(0, scanProgress.current - validIds.length)
+        };
+        setScanProgress(newProgress);
+
+        saveScanSession(scanStatus, newResults, newStats, newProgress);
+      }
+
+      console.log(`[BulkDelete] Succès: ${validIds.length} supprimés, ${invalidCount} ignorés.`);
+      return { success: true, count: validIds.length, ignored: invalidCount };
+    } catch (e) {
+      console.error("[BulkDelete] Erreur critique:", e);
+      return { success: false, error: e.message, ignored: invalidCount };
+    }
   };
 
   const hiddenFolderNames = ['Perso', 'Boulot', ':: Perso ::', ':: Boulot ::'];
@@ -642,24 +725,163 @@ export function useBookmarks(user) {
     .sort((a, b) => (b.clicks || 0) - (a.clicks || 0))
     .slice(0, 10);
 
-  const scanDeadLinks = async (onProgress) => {
-    setIsScanning(true);
-    const results = { dead: [], ok: [], total: data.bookmarks.length };
-    const all = data.bookmarks;
-    
-    for (let i = 0; i < all.length; i++) {
-        const b = all[i];
-        if (onProgress) onProgress(i + 1, all.length, b.title);
-        try {
-            await fetch(b.url, { mode: 'no-cors', cache: 'no-store' });
-            results.ok.push(b.id);
-        } catch (e) {
-            results.dead.push({ id: b.id, title: b.title, url: b.url });
-        }
+  const stopScan = () => {
+    if (isScanning) {
+      isStoppingRef.current = true;
+      setScanStatus('stopped');
     }
-    
-    setScanResults(results);
+  };
+
+  const setManualDecision = (bookmarkId, decision) => {
+    setScanResults(prev => {
+      const newResults = (prev || []).map(item => 
+        item.id === bookmarkId ? { ...item, manualDecision: decision } : item
+      );
+      saveScanSession(scanStatus, newResults, scanStats, scanProgress);
+      return newResults;
+    });
+  };
+
+  const resetScan = () => {
+    isStoppingRef.current = true;
     setIsScanning(false);
+    setScanStatus('idle');
+    setScanResults(null);
+    setScanStats({ total: 0, analyzed: 0, ok: 0, suspect: 0, dead: 0 });
+    setScanProgress({ current: 0, total: 0, title: '' });
+    setScanRestored(false);
+    localStorage.removeItem('bookmarkTracker_linkCheckSession');
+  };
+
+  const scanDeadLinks = async (resume = false) => {
+    if (isScanning) return; // Prevent double trigger
+    
+    setIsScanning(true);
+    setScanStatus('scanning');
+    setScanRestored(false);
+    isStoppingRef.current = false;
+    
+    const all = data.bookmarks;
+    let stats = { total: all.length, analyzed: 0, ok: 0, suspect: 0, dead: 0 };
+    let results = [];
+    let itemsToScan = all;
+
+    if (resume && scanResults && scanResults.length > 0) {
+      stats = { ...scanStats, total: all.length }; // Ensure total is up to date
+      results = [...scanResults];
+      const alreadyTestedIds = new Set(results.map(r => r.id));
+      itemsToScan = all.filter(b => !alreadyTestedIds.has(b.id));
+    } else {
+      setScanStats({ ...stats });
+      setScanProgress({ current: 0, total: all.length, title: 'Démarrage...' });
+      setScanResults(null);
+    }
+
+    try {
+      const batchSize = 5; // Reduced concurrency for stability
+      for (let i = 0; i < itemsToScan.length; i += batchSize) {
+        if (isStoppingRef.current) break;
+
+        const batch = itemsToScan.slice(i, i + batchSize);
+        
+        await Promise.all(batch.map(async (b) => {
+          let status = 'NON_TESTÉ';
+          let errorMsg = '';
+          let code = null;
+
+          try {
+            // 1. Basic URL validation
+            try {
+              new URL(b.url);
+            } catch (e) {
+              status = 'MORT_PROBABLE';
+              errorMsg = 'URL Structurellement Invalide';
+              stats.dead++;
+              results.push({ ...b, status, errorMsg, folderName: data.folders.find(f => f.id === b.folderId)?.name || 'Racine', scope: b.type === 'pro' ? 'Boulot' : 'Perso' });
+              stats.analyzed++;
+              return;
+            }
+
+            // 2. Network test
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+            try {
+              await fetch(b.url, { 
+                mode: 'no-cors', 
+                signal: controller.signal,
+                cache: 'no-store'
+              });
+              status = 'OK';
+              stats.ok++;
+            } catch (e) {
+              status = 'SUSPECT';
+              if (e.name === 'AbortError') {
+                errorMsg = 'Timeout / Résultat incertain';
+              } else {
+                errorMsg = 'Erreur Réseau / Blocage probable';
+              }
+              stats.suspect++;
+            } finally {
+              clearTimeout(timeoutId);
+            }
+          } catch (e) {
+            status = 'SUSPECT';
+            errorMsg = 'Erreur technique';
+            stats.suspect++;
+          }
+
+          const folder = data.folders.find(f => f.id === b.folderId);
+          results.push({
+            ...b,
+            status,
+            errorMsg,
+            code,
+            folderName: folder ? folder.name : 'Racine',
+            scope: b.type === 'pro' ? 'Boulot' : 'Perso'
+          });
+
+          stats.analyzed++;
+          setScanProgress({ current: stats.analyzed, total: stats.total, title: b.title });
+        }));
+
+        setScanStats({ ...stats });
+        // Update results incrementally so if modal opens, they are there
+        const currentResults = [...results];
+        setScanResults(currentResults);
+        
+        const currentProgress = { current: stats.analyzed, total: stats.total, title: 'Lot suivant...' };
+        setScanProgress(currentProgress);
+        
+        saveScanSession('scanning', currentResults, stats, currentProgress);
+
+        // Longer pause between batches to let React/Browser breathe
+        await new Promise(r => setTimeout(r, 200));
+      }
+      
+      const finalResults = [...results];
+      setScanResults(finalResults);
+      let finalStatus = 'completed';
+      
+      if (isStoppingRef.current) {
+        finalStatus = 'stopped';
+        setScanStatus(finalStatus);
+      } else {
+        setScanStatus(finalStatus);
+      }
+      
+      saveScanSession(finalStatus, finalResults, stats, { current: stats.analyzed, total: stats.total, title: 'Terminé' });
+      
+    } catch (e) {
+      console.error("Critical error during scan:", e);
+      const partialResults = [...results];
+      setScanResults(partialResults); // Preserve partial results
+      setScanStatus('error');
+      saveScanSession('error', partialResults, stats, { current: stats.analyzed, total: stats.total, title: 'Erreur' });
+    } finally {
+      setIsScanning(false);
+      isStoppingRef.current = false;
+    }
     return results;
   };
 
@@ -780,9 +1002,16 @@ export function useBookmarks(user) {
     isSyncing,
     runDiagnostics,
     scanDeadLinks,
+    stopScan,
+    resetScan,
     isScanning,
+    scanStatus,
     scanResults,
+    scanStats,
+    scanProgress,
+    scanRestored,
     setScanResults,
+    setManualDecision,
     bulkDelete,
     analyzeImport,
     commitSmartImport

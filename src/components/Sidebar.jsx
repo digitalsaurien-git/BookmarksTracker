@@ -4,10 +4,10 @@ import {
   Folder, FolderOpen, ChevronRight, ChevronDown, 
   Library, Hash, Briefcase, User, MoreVertical,
   PlusCircle, FolderPlus, Compass, Settings, Trash2, Edit2,
-  Sparkles, RefreshCw, Upload
+  Sparkles, RefreshCw, Upload, Link2
 } from 'lucide-react';
 
-const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId, onOpenSmartImport, onOpenPrefs }) => {
+const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId, onOpenSmartImport, onOpenPrefs, onOpenLinkChecker }) => {
   const { folders, activeContext, setContext, addFolder, moveFolder, renameFolder } = bookmarks;
 
   const handleToggle = (id) => {
@@ -297,6 +297,14 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId, onOpenSmartImpor
         <div className="flex items-center gap-3 mb-4 px-2">
           <Settings size={12} className="text-purple-500" />
           <h3 className="text-[9px] font-black text-slate-300 uppercase tracking-[0.3em]">Boîte à outils</h3>
+        </div>
+        <div className="px-2 mb-6">
+           <button 
+             onClick={onOpenLinkChecker}
+             className="w-full flex items-center gap-3 px-4 py-3.5 bg-indigo-50 text-indigo-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all group border border-indigo-100/50 shadow-sm"
+           >
+             <Link2 size={14} className="group-hover:rotate-12 transition-transform" /> Contrôle des liens
+           </button>
         </div>
         <div className="flex flex-wrap gap-1.5 px-2">
           {[...new Set(

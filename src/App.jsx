@@ -6,6 +6,7 @@ import AddBookmarkForm from './components/AddBookmarkForm';
 import ImportModal from './components/ImportModal';
 import SmartImportModal from './components/SmartImportModal';
 import PreferencesModal from './components/PreferencesModal';
+import LinkCheckerModal from './components/LinkCheckerModal';
 import LoginView from './components/LoginView';
 import { useBookmarks } from './hooks/useBookmarks';
 import { useAuth } from './hooks/useAuth';
@@ -20,6 +21,7 @@ function App() {
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [isSmartOpen, setIsSmartOpen] = useState(false);
   const [isPrefsOpen, setIsPrefsOpen] = useState(false);
+  const [isLinkCheckerOpen, setIsLinkCheckerOpen] = useState(false);
 
   if (auth.isLoading) return null;
   if (!auth.isAuthenticated) return <LoginView auth={auth} />;
@@ -38,6 +40,7 @@ function App() {
           selectedFolderId={selectedFolderId}
           onOpenSmartImport={() => setIsSmartOpen(true)}
           onOpenPrefs={() => setIsPrefsOpen(true)}
+          onOpenLinkChecker={() => setIsLinkCheckerOpen(true)}
         />
         
         {/* User Profile / Logout */}
@@ -152,6 +155,11 @@ function App() {
           <PreferencesModal 
             isOpen={isPrefsOpen} 
             onClose={() => setIsPrefsOpen(false)} 
+            bookmarks={bookmarks}
+          />
+          <LinkCheckerModal 
+            isOpen={isLinkCheckerOpen} 
+            onClose={() => setIsLinkCheckerOpen(false)} 
             bookmarks={bookmarks}
           />
         </AnimatePresence>

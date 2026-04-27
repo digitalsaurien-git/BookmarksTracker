@@ -202,15 +202,15 @@ const PreferencesModal = ({ isOpen, onClose, bookmarks }) => {
                     <div className="grid grid-cols-2 gap-4 mb-8">
                        <div className="p-6 bg-emerald-50 rounded-3xl border border-emerald-100">
                           <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-1">Accessibles</p>
-                          <p className="text-3xl font-black text-emerald-600">{bookmarks.scanResults.ok.length}</p>
+                          <p className="text-3xl font-black text-emerald-600">{bookmarks.scanStats.ok}</p>
                        </div>
                        <div className="p-6 bg-rose-50 rounded-3xl border border-rose-100">
-                          <p className="text-[10px] font-black text-rose-400 uppercase tracking-widest mb-1">Mort ou bloqué</p>
-                          <p className="text-3xl font-black text-rose-600">{bookmarks.scanResults.dead.length}</p>
+                          <p className="text-[10px] font-black text-rose-400 uppercase tracking-widest mb-1">Problèmes</p>
+                          <p className="text-3xl font-black text-rose-600">{bookmarks.scanStats.dead + bookmarks.scanStats.suspect}</p>
                        </div>
                     </div>
 
-                    {bookmarks.scanResults.dead.length > 0 && (
+                    {(bookmarks.scanResults || []).filter(b => b.status !== 'OK').length > 0 && (
                       <div className="flex-1 flex flex-col min-h-0">
                         <div className="flex items-center justify-between mb-4">
                           <h4 className="text-xs font-black text-slate-900 uppercase tracking-widest">Favoris à traiter</h4>
@@ -225,18 +225,19 @@ const PreferencesModal = ({ isOpen, onClose, bookmarks }) => {
                             )}
                             <button 
                               onClick={() => {
-                                if(selectedDeadIndices.length === bookmarks.scanResults.dead.length) setSelectedDeadIndices([]);
-                                else setSelectedDeadIndices(bookmarks.scanResults.dead.map(d => d.id));
+                                const problems = (bookmarks.scanResults || []).filter(b => b.status !== 'OK');
+                                if(selectedDeadIndices.length === problems.length) setSelectedDeadIndices([]);
+                                else setSelectedDeadIndices(problems.map(d => d.id));
                               }}
                               className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-900"
                             >
-                              {selectedDeadIndices.length === bookmarks.scanResults.dead.length ? 'Tout déselectionner' : 'Tout sélectionner'}
+                              {selectedDeadIndices.length === (bookmarks.scanResults || []).filter(b => b.status !== 'OK').length ? 'Tout déselectionner' : 'Tout sélectionner'}
                             </button>
                           </div>
                         </div>
 
                         <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-                           {bookmarks.scanResults.dead.map(b => (
+                           {(bookmarks.scanResults || []).filter(b => b.status !== 'OK').map(b => (
                              <div key={b.id} className="p-4 bg-white border border-slate-100 rounded-2xl flex items-center justify-between group hover:border-slate-200 transition-all">
                                <div className="flex items-center gap-4 min-w-0">
                                   <input 
@@ -247,7 +248,12 @@ const PreferencesModal = ({ isOpen, onClose, bookmarks }) => {
                                   />
                                   <div className="min-w-0">
                                     <p className="text-sm font-bold text-slate-900 truncate">{b.title}</p>
-                                    <p className="text-[10px] text-slate-400 truncate mt-0.5">{b.url}</p>
+                                    <div className="flex items-center gap-2 mt-0.5">
+                                      <p className="text-[10px] text-slate-400 truncate">{b.url}</p>
+                                      <span className={`text-[8px] font-black px-1.5 py-0.5 rounded uppercase ${b.status === 'SUSPECT' ? 'bg-amber-100 text-amber-600' : 'bg-rose-100 text-rose-600'}`}>
+                                        {b.status}
+                                      </span>
+                                    </div>
                                   </div>
                                </div>
                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

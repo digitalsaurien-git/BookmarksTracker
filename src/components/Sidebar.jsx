@@ -63,7 +63,11 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId, onOpenSmartImpor
             isSelected ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/10 scale-[1.02]' : 'hover:bg-slate-50 text-slate-600'
           }`}
           style={{ marginLeft: `${level * 16}px` }}
-          onClick={() => onSelectFolder(folder.id)}
+          onClick={() => {
+            onSelectFolder(folder.id);
+            bookmarks.setActiveFilter('all');
+            bookmarks.setSearchQuery('');
+          }}
         >
           <div 
             onClick={(e) => {

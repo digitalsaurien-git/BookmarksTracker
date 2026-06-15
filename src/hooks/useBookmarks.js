@@ -443,16 +443,105 @@ export function useBookmarks(user) {
     }
   };
 
+  const getFolderDeletionStats = useCallback((folderId) => {
+    const getDescendants = (parentId) => {
+      const result = [];
+      const recurse = (id) => {
+        const children = data.folders.filter(f => f.parentId === id);
+        for (const child of children) {
+          result.push(child);
+          recurse(child.id);
+        }
+      };
+      recurse(parentId);
+      return result;
+    };
+    const descendants = getDescendants(folderId);
+    const folderIds = [folderId, ...descendants.map(f => f.id)];
+    const bookmarksCount = data.bookmarks.filter(b => folderIds.includes(b.folderId)).length;
+    return {
+      subfoldersCount: descendants.length,
+      bookmarksCount: bookmarksCount
+    };
+  }, [data.folders, data.bookmarks]);
+
   const deleteFolder = async (folderId) => {
-    if (user) {
+    try {
+      if (user) {
         const { error } = await supabase.from('bt_folders').delete().eq('id', folderId);
-        if (error) { console.error("Error deleting folder", error); return; }
+        if (error) {
+          console.error("Error deleting folder", error);
+          return { success: false, error: error.message };
+        }
+      }
+      setData(prev => ({
+        ...prev,
+        folders: prev.folders
+          .filter(f => f.id !== folderId)
+          .map(f => f.parentId === folderId ? { ...f, parentId: null } : f),
+        bookmarks: prev.bookmarks.map(b => b.folderId === folderId ? { ...b, folderId: null } : b)
+      }));
+      return { success: true };
+    } catch (e) {
+      console.error("Critical error in deleteFolder:", e);
+      return { success: false, error: e.message || String(e) };
     }
-    setData(prev => ({
-      ...prev,
-      folders: prev.folders.filter(f => f.id !== folderId),
-      bookmarks: prev.bookmarks.map(b => b.folderId === folderId ? { ...b, folderId: null } : b)
-    }));
+  };
+
+  const deleteFolderWithContent = async (folderId) => {
+    try {
+      const getDescendants = (parentId) => {
+        const result = [];
+        const recurse = (id) => {
+          const children = data.folders.filter(f => f.parentId === id);
+          for (const child of children) {
+            result.push(child);
+            recurse(child.id);
+          }
+        };
+        recurse(parentId);
+        return result;
+      };
+
+      const descendants = getDescendants(folderId);
+      const folderIdsToDelete = [folderId, ...descendants.map(f => f.id)];
+
+      if (user) {
+        // 1. Supprimer d'abord les bookmarks associés aux dossiers (respect des contraintes SQL)
+        const { error: bookmarksError } = await supabase
+          .from('bt_bookmarks')
+          .delete()
+          .in('folder_id', folderIdsToDelete);
+          
+        if (bookmarksError) {
+          console.error("Error deleting bookmarks inside folder", bookmarksError);
+          return { success: false, error: bookmarksError.message };
+        }
+
+        // 2. Supprimer les dossiers
+        const { error: foldersError } = await supabase
+          .from('bt_folders')
+          .delete()
+          .in('id', folderIdsToDelete);
+
+        if (foldersError) {
+          console.error("Error deleting folders", foldersError);
+          return { success: false, error: foldersError.message };
+        }
+      }
+
+      // Mettre à jour l'état local React
+      setData(prev => ({
+        ...prev,
+        folders: prev.folders.filter(f => !folderIdsToDelete.includes(f.id)),
+        bookmarks: prev.bookmarks.filter(b => !folderIdsToDelete.includes(b.folderId))
+      }));
+
+      return { success: true };
+    } catch (e) {
+      console.error("Critical error in deleteFolderWithContent:", e);
+      return { success: false, error: e.message || String(e) };
+    }
   };
 
   const renameFolder = async (folderId, newName) => {
@@ -978,6 +1067,8 @@ export function useBookmarks(user) {
     allBookmarks: effectiveBookmarks,
     addFolder,
     deleteFolder,
+    deleteFolderWithContent,
+    getFolderDeletionStats,
     toggleFolderExpand,
     moveFolder,
     renameFolder,

@@ -46,6 +46,7 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId, onOpenSmartImpor
     const isSelected = selectedFolderId === folder.id;
     const isExpanded = folder.isExpanded;
     const hasChildren = getSubfolders(folder.id).length > 0;
+    const [showDeleteMenu, setShowDeleteMenu] = React.useState(false);
 
     return (
       <div 
@@ -122,20 +123,78 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId, onOpenSmartImpor
                 <FolderPlus size={14} />
               </button>
             )}
-            <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                if (window.confirm(`Supprimer le dossier "${folder.name}" et tout son contenu ?`)) {
-                  bookmarks.deleteFolder(folder.id);
-                }
-              }}
-              className={`p-1.5 rounded-lg transition-all ${
-                isSelected ? 'hover:bg-white/20 text-white' : 'hover:bg-rose-50 text-slate-300 hover:text-rose-500'
-              }`}
-              title="Supprimer"
-            >
-              <Trash2 size={14} />
-            </button>
+            
+            <div className="relative">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowDeleteMenu(!showDeleteMenu);
+                }}
+                className={`p-1.5 rounded-lg transition-all ${
+                  isSelected ? 'hover:bg-white/20 text-white' : 'hover:bg-rose-50 text-slate-300 hover:text-rose-500'
+                } ${showDeleteMenu ? 'bg-rose-50 text-rose-500' : ''}`}
+                title="Supprimer"
+              >
+                <Trash2 size={14} />
+              </button>
+              
+              {showDeleteMenu && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-[100]" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowDeleteMenu(false);
+                    }}
+                  />
+                  <div className="absolute right-0 top-full mt-2 w-64 bg-white border border-slate-100 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] z-[110] py-2 overflow-hidden animate-fade-in border-t-4 border-t-rose-500">
+                    <div className="px-4 py-2 mb-1 border-b border-slate-50">
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Options de suppression</p>
+                    </div>
+                    <button 
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        setShowDeleteMenu(false);
+                        if (window.confirm(`Supprimer uniquement le dossier "${folder.name}" ? Les liens et sous-dossiers seront conservés.`)) {
+                          const res = await bookmarks.deleteFolder(folder.id);
+                          if (res && !res.success) {
+                            alert(`Erreur lors de la suppression : ${res.error}`);
+                          }
+                        }
+                      }}
+                      className="w-full text-left px-4 py-2.5 text-[12px] font-bold text-slate-700 hover:bg-slate-50 transition-colors block"
+                    >
+                      Supprimer le dossier uniquement
+                    </button>
+                    <button 
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        setShowDeleteMenu(false);
+                        
+                        // Calculer les statistiques réelles de suppression récursive
+                        const stats = bookmarks.getFolderDeletionStats(folder.id);
+                        const msg = `Êtes-vous sûr de vouloir supprimer définitivement le dossier "${folder.name}" ?\n\n` +
+                                    `Cette action supprimera :\n` +
+                                    `- Le dossier principal "${folder.name}"\n` +
+                                    `- Ses sous-dossiers (nombre : ${stats.subfoldersCount})\n` +
+                                    `- Tous les liens associés (nombre : ${stats.bookmarksCount})\n\n` +
+                                    `ATTENTION : Cette action est irréversible.`;
+                        
+                        if (window.confirm(msg)) {
+                          const res = await bookmarks.deleteFolderWithContent(folder.id);
+                          if (res && !res.success) {
+                            alert(`Erreur lors de la suppression complète : ${res.error}`);
+                          }
+                        }
+                      }}
+                      className="w-full text-left px-4 py-2.5 text-[12px] font-bold text-rose-600 hover:bg-rose-50 transition-colors block"
+                    >
+                      Supprimer le dossier et tous les liens
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
 
@@ -379,13 +438,16 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId, onOpenSmartImpor
         >
           <Upload size={14} className="group-hover:translate-y-[-1px] transition-all" /> Sync via GitHub
         </button>
-        <div className="flex items-center justify-between opacity-50 hover:opacity-100 transition-opacity">
+        <div className="flex flex-col gap-2 opacity-50 hover:opacity-100 transition-opacity">
           <button 
             onClick={onOpenPrefs}
             className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-colors"
           >
             <Settings size={14} /> Préférences & Maintenance
           </button>
+          <div className="text-[9px] font-black text-slate-300 uppercase tracking-widest pl-7">
+            Build: suppression-dossiers-v1
+          </div>
         </div>
       </div>
     </div>

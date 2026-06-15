@@ -446,7 +446,7 @@ const Sidebar = ({ bookmarks, onSelectFolder, selectedFolderId, onOpenSmartImpor
             <Settings size={14} /> Préférences & Maintenance
           </button>
           <div className="text-[9px] font-black text-slate-300 uppercase tracking-widest pl-7">
-            Build: suppression-dossiers-v1
+            Build: cartes-compactes-v1
           </div>
         </div>
       </div>
